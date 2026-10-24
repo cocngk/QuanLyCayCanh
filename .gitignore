@@ -13,3 +13,6 @@
 .externalNativeBuild
 .cxx
 local.properties
+
+# Báo cáo / tài liệu nội bộ — không đưa lên git
+/docs/
