@@ -1,9 +1,29 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
-    <style name="Base.Theme.QuanLyCayCanh" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+    <style name="Base.Theme.QuanLyCayCanh" parent="Theme.Material3.Light.NoActionBar">
+        <item name="colorPrimary">@color/brown</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorPrimaryContainer">@color/brown_light</item>
+        <item name="colorOnPrimaryContainer">@color/brown_dark</item>
+        <item name="colorSecondary">@color/green</item>
+        <item name="colorOnSecondary">@color/white</item>
+        <item name="colorSecondaryContainer">@color/green_light</item>
+        <item name="colorOnSecondaryContainer">@color/brown_dark</item>
+        <item name="colorSurface">@color/paper</item>
+        <item name="colorOnSurface">@color/brown_dark</item>
+        <item name="colorSurfaceVariant">@color/cream</item>
+        <item name="colorOnSurfaceVariant">@color/muted</item>
+        <item name="colorOutline">@color/line</item>
+        <item name="android:colorBackground">@color/cream</item>
+        <item name="android:statusBarColor">@color/cream</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:navigationBarColor">@color/paper</item>
     </style>
 
     <style name="Theme.QuanLyCayCanh" parent="Base.Theme.QuanLyCayCanh" />
+
+    <style name="Text.Section" parent="">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/brown_dark</item>
+    </style>
 </resources>

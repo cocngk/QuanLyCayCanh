@@ -2,4 +2,28 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <!-- Bảng màu nâu – kem lấy từ bộ slide -->
+    <color name="cream">#FBF7F0</color>
+    <color name="paper">#FFFDF9</color>
+    <color name="brown">#6D4C41</color>
+    <color name="brown_dark">#43302A</color>
+    <color name="brown_light">#EADFD3</color>
+    <color name="muted">#7A6A5D</color>
+    <color name="line">#E4D8C9</color>
+
+    <color name="green">#4F7A52</color>
+    <color name="green_light">#DCE9DA</color>
+    <color name="amber">#C7873A</color>
+    <color name="amber_light">#F7E7CE</color>
+    <color name="red">#A94442</color>
+    <color name="red_light">#F6DCDA</color>
+    <color name="blue">#3F6480</color>
+    <color name="blue_light">#DCE6EE</color>
+
+    <!-- Nền minh hoạ sản phẩm theo danh mục -->
+    <color name="cat_desk">#F3E3D7</color>
+    <color name="cat_indoor">#DDE8D8</color>
+    <color name="cat_feng">#F6E4C8</color>
+    <color name="cat_outdoor">#DCE7EF</color>
 </resources>

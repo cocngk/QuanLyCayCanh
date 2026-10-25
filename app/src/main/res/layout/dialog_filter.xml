@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/paper"
+        android:orientation="vertical"
+        android:padding="20dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Lọc sản phẩm"
+            android:textColor="@color/brown_dark"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:text="Loại cây"
+            style="@style/Text.Section" />
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/chipLoai"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            app:singleSelection="true" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:text="Khoảng giá"
+            style="@style/Text.Section" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:orientation="horizontal">
+
+            <EditText
+                android:id="@+id/edGiaTu"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_search"
+                android:hint="Từ"
+                android:inputType="number"
+                android:paddingHorizontal="14dp"
+                android:textColor="@color/brown_dark"
+                android:textColorHint="@color/muted"
+                android:textSize="14sp" />
+
+            <EditText
+                android:id="@+id/edGiaDen"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_marginStart="10dp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_search"
+                android:hint="Đến"
+                android:inputType="number"
+                android:paddingHorizontal="14dp"
+                android:textColor="@color/brown_dark"
+                android:textColorHint="@color/muted"
+                android:textSize="14sp" />
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:text="Sắp xếp"
+            style="@style/Text.Section" />
+
+        <RadioGroup
+            android:id="@+id/rgSapXep"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp">
+
+            <RadioButton
+                android:id="@+id/rbMacDinh"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:text="Mặc định"
+                android:textColor="@color/brown_dark" />
+
+            <RadioButton
+                android:id="@+id/rbGiaTang"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Giá thấp đến cao"
+                android:textColor="@color/brown_dark" />
+
+            <RadioButton
+                android:id="@+id/rbGiaGiam"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Giá cao đến thấp"
+                android:textColor="@color/brown_dark" />
+
+            <RadioButton
+                android:id="@+id/rbMoiNhat"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Mới nhất"
+                android:textColor="@color/brown_dark" />
+        </RadioGroup>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:orientation="horizontal">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnXoaLoc"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_weight="1"
+                android:text="Xoá bộ lọc"
+                android:textAllCaps="false"
+                android:textColor="@color/brown"
+                app:cornerRadius="14dp"
+                app:strokeColor="@color/line" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnApDung"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_marginStart="10dp"
+                android:layout_weight="1"
+                android:text="Áp dụng"
+                android:textAllCaps="false"
+                app:cornerRadius="14dp" />
+        </LinearLayout>
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>
