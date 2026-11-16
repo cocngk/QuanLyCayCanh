@@ -249,7 +249,11 @@ public class StatsFragment extends Fragment {
         params.setMarginEnd(Ui.dp(requireContext(), 8));
         image.setLayoutParams(params);
         image.setContentDescription(p.tenCay);
+        image.setScaleType(ImageView.ScaleType.CENTER_CROP);
         Ui.hienAnhCay(requireContext(), p.hinhAnh, image, p.maLoai);
+        image.setBackground(Ui.boTron(requireContext(),
+                Ui.nenDanhMuc(requireContext(), p.maLoai), 16));
+        image.setClipToOutline(true);
         return image;
     }
 
