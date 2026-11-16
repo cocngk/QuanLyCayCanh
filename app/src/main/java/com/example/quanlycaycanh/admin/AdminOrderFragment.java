@@ -23,7 +23,7 @@ import com.example.quanlycaycanh.Ui;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 
-/** UC23–UC27 — Quản lý đơn: tìm kiếm, xem chi tiết, cập nhật trạng thái, tạo đơn tại quầy. */
+/** Tra cứu và cập nhật hóa đơn nội bộ; tạo hóa đơn tại quầy. */
 public class AdminOrderFragment extends Fragment {
 
     private Repository repo;
@@ -46,7 +46,7 @@ public class AdminOrderFragment extends Fragment {
 
         RecyclerView rv = v.findViewById(R.id.rvDonHang);
         rv.setLayoutManager(new LinearLayoutManager(requireContext()));
-        adapter = new OrderAdapter(true, don -> {
+        adapter = new OrderAdapter(don -> {
             Intent i = new Intent(requireContext(), OrderDetailActivity.class);
             i.putExtra(OrderDetailActivity.EXTRA_MA_DON, (long) don.maDonHang);
             startActivity(i);
@@ -72,10 +72,10 @@ public class AdminOrderFragment extends Fragment {
 
         ChipGroup chip = v.findViewById(R.id.chipTrangThai);
         themChip(chip, "Tất cả", "TAT_CA");
-        themChip(chip, "Chờ xác nhận", DonHang.CHO_XAC_NHAN);
-        themChip(chip, "Đang giao", DonHang.DANG_GIAO);
-        themChip(chip, "Đã giao", DonHang.DA_GIAO);
-        themChip(chip, "Đã huỷ", DonHang.DA_HUY);
+        themChip(chip, "Chờ xử lý", DonHang.CHO_XAC_NHAN);
+        themChip(chip, "Đang xử lý", DonHang.DANG_GIAO);
+        themChip(chip, "Đã hoàn tất", DonHang.DA_GIAO);
+        themChip(chip, "Đã hủy", DonHang.DA_HUY);
 
         v.findViewById(R.id.btnTaoDon).setOnClickListener(x ->
                 startActivity(new Intent(requireContext(), CreateOrderActivity.class)));
@@ -116,6 +116,6 @@ public class AdminOrderFragment extends Fragment {
         tvTongQuan.setText("Hóa đơn: " + repo.countOrders()
                 + "  ·  Hoàn thành: " + completed
                 + "  ·  Đã hủy: " + cancelled
-                + "\nDoanh thu đã giao: " + Ui.vnd(repo.totalRevenue()));
+                + "\nDoanh thu hóa đơn hoàn tất: " + Ui.vnd(repo.totalRevenue()));
     }
 }

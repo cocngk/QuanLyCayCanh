@@ -50,7 +50,7 @@ public class OrderDetailActivity extends AppCompatActivity {
         hienThi();
     }
 
-    /** "CHO_XAC_NHAN | 2026-10-25 14:14:48 | Khách đặt hàng" -> nhãn dễ đọc. */
+    /** Chuyển lịch sử trạng thái thành nội dung dễ đọc. */
     private String lichSuDep(String raw) {
         if (raw == null || raw.trim().isEmpty()) {
             return "—";
@@ -62,9 +62,6 @@ public class OrderDetailActivity extends AppCompatActivity {
                 continue;
             }
             String ma = phan[0].trim();
-            if (DonHang.GIO.equals(ma)) {
-                continue;
-            }
             String thoiGian = Repository.dinhDangThoiGian(phan[1].trim());
             String ghiChu = phan.length > 2 ? phan[2].trim() : "";
             if (sb.length() > 0) {
@@ -86,23 +83,22 @@ public class OrderDetailActivity extends AppCompatActivity {
         TextView tvMaDon = findViewById(R.id.tvMaDon);
         TextView tvKhach = findViewById(R.id.tvKhach);
         TextView tvThanhToan = findViewById(R.id.tvThanhToan);
-        TextView tvDiaChi = findViewById(R.id.tvDiaChi);
+        TextView tvSoDienThoai = findViewById(R.id.tvSoDienThoai);
         TextView tvGhiChu = findViewById(R.id.tvGhiChu);
         LinearLayout khungSanPham = findViewById(R.id.khungSanPham);
-        TextView tvTamTinh = findViewById(R.id.tvTamTinh);
-        TextView tvPhiShip = findViewById(R.id.tvPhiShip);
         TextView tvTongTien = findViewById(R.id.tvTongTien);
         TextView tvLichSu = findViewById(R.id.tvLichSu);
         TextView tvTieuDe = findViewById(R.id.tvTieuDe);
 
         tvTieuDe.setText("Chi tiết hóa đơn");
         Ui.ganNhanTrangThai(this, tvTrangThai, don.trangThai);
-        tvMaDon.setText("#" + don.maDonHang + " · " + Repository.dinhDangThoiGian(don.ngayDat)
-                + (DonHang.TAI_QUAY.equals(don.loaiDonHang) ? " · Tại quầy" : ""));
-        tvKhach.setText("Khách: " + (don.tenKhach == null ? "—" : don.tenKhach));
+        tvMaDon.setText("#" + don.maDonHang + " · " + Repository.dinhDangThoiGian(don.ngayDat));
+        tvKhach.setText("Khách: " + (don.tenKhach == null || don.tenKhach.trim().isEmpty()
+                ? "Khách mua lẻ" : don.tenKhach));
         tvThanhToan.setText("Thanh toán: " + (don.phuongThucThanhToan == null ? "—" : don.phuongThucThanhToan));
-        tvDiaChi.setText("Giao đến: " + (don.diaChiGiao == null || don.diaChiGiao.isEmpty()
-                ? "Mua trực tiếp tại cửa hàng" : don.diaChiGiao));
+        tvSoDienThoai.setText("Số điện thoại: "
+                + (don.soDienThoaiKhach == null || don.soDienThoaiKhach.trim().isEmpty()
+                ? "—" : don.soDienThoaiKhach));
         tvGhiChu.setText("Ghi chú: " + (don.ghiChu == null || don.ghiChu.isEmpty() ? "—" : don.ghiChu));
 
         khungSanPham.removeAllViews();
@@ -122,20 +118,11 @@ public class OrderDetailActivity extends AppCompatActivity {
             khungSanPham.addView(row);
         }
 
-        double phiShip = DonHang.TAI_QUAY.equals(don.loaiDonHang)
-                || DonHang.DA_HUY.equals(don.trangThai) ? 0 : Repository.PHI_VAN_CHUYEN;
-        tvTamTinh.setText(Ui.vnd(don.tongTien - phiShip));
-        tvPhiShip.setText(DonHang.DA_HUY.equals(don.trangThai) ? "—"
-                : phiShip <= 0 ? "Miễn phí" : Ui.vnd(phiShip));
         tvTongTien.setText(Ui.vnd(don.tongTien));
         tvLichSu.setText(lichSuDep(don.lichSuTrangThai));
 
-        MaterialButton btnHuy = findViewById(R.id.btnHuyDon);
-        MaterialButton btnMuaLai = findViewById(R.id.btnMuaLai);
         MaterialButton btnCapNhat = findViewById(R.id.btnCapNhat);
 
-        btnHuy.setVisibility(View.GONE);
-        btnMuaLai.setVisibility(View.GONE);
         btnCapNhat.setVisibility(!DonHang.DA_GIAO.equals(don.trangThai)
                 && !DonHang.DA_HUY.equals(don.trangThai) ? View.VISIBLE : View.GONE);
 
@@ -143,13 +130,13 @@ public class OrderDetailActivity extends AppCompatActivity {
     }
 
     private void chonTrangThai() {
-        final String[] nhan = {"Duyệt đơn → Đang giao", "Đã giao", "Huỷ đơn"};
+        final String[] nhan = {"Bắt đầu xử lý", "Hoàn tất hóa đơn", "Hủy hóa đơn"};
         final String[] giaTri = {DonHang.DANG_GIAO, DonHang.DA_GIAO, DonHang.DA_HUY};
         new AlertDialog.Builder(this)
                 .setTitle("Cập nhật trạng thái đơn #" + don.maDonHang)
                 .setItems(nhan, (d, which) -> {
                     repo.updateStatus(don.maDonHang, giaTri[which],
-                            "Quản trị viên cập nhật: " + Ui.nhanTrangThai(giaTri[which]));
+                            "Nhân viên cập nhật: " + Ui.nhanTrangThai(giaTri[which]));
                     Ui.toast(this, "Đã cập nhật: " + Ui.nhanTrangThai(giaTri[which]));
                     onResume();
                 })

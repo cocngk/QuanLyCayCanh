@@ -16,13 +16,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-/**
- * Lớp truy cập dữ liệu duy nhất của ứng dụng. Mọi truy vấn đều bám theo 7 thực thể
- * ở chương 3 báo cáo; giỏ hàng là {@code DonHang} trạng thái {@code GIO}.
- */
+/** Truy cập dữ liệu cho các luồng quản trị cửa hàng. */
 public class Repository {
 
-    public static final double PHI_VAN_CHUYEN = 30000;
     public static final int NGUONG_TON_THAP = 5;
 
     private final DBHelper helper;
@@ -49,7 +45,7 @@ public class Repository {
         return new SimpleDateFormat("yyyy-MM-dd", Locale.US).format(c.getTime());
     }
 
-    // ======================================================== Tài khoản (P1)
+    // ======================================================== Tài khoản quản trị
 
     public TaiKhoan login(String taiKhoan, String matKhau) {
         Cursor c = db().rawQuery("SELECT * FROM TaiKhoan WHERE (Email = ? OR SoDienThoai = ?) "
@@ -70,35 +66,6 @@ public class Repository {
         }
     }
 
-    public boolean emailExists(String email) {
-        Cursor c = db().rawQuery("SELECT 1 FROM TaiKhoan WHERE Email = ?", new String[]{email});
-        try {
-            return c.moveToFirst();
-        } finally {
-            c.close();
-        }
-    }
-
-    public long register(String hoTen, String email, String soDienThoai, String diaChi, String matKhau) {
-        ContentValues v = new ContentValues();
-        v.put("HoTen", hoTen);
-        v.put("Email", email);
-        v.put("SoDienThoai", soDienThoai);
-        v.put("DiaChi", diaChi);
-        v.put("MatKhau", matKhau);
-        v.put("VaiTro", TaiKhoan.KHACH_HANG);
-        return db().insert(DBHelper.T_TAIKHOAN, null, v);
-    }
-
-    public void updateProfile(TaiKhoan tk) {
-        ContentValues v = new ContentValues();
-        v.put("HoTen", tk.hoTen);
-        v.put("Email", tk.email);
-        v.put("SoDienThoai", tk.soDienThoai);
-        v.put("DiaChi", tk.diaChi);
-        db().update(DBHelper.T_TAIKHOAN, v, "MaTaiKhoan = ?", new String[]{String.valueOf(tk.maTaiKhoan)});
-    }
-
     public boolean changePassword(int maTaiKhoan, String matKhauCu, String matKhauMoi) {
         ContentValues v = new ContentValues();
         v.put("MatKhau", matKhauMoi);
@@ -115,52 +82,10 @@ public class Repository {
         t.email = c.getString(c.getColumnIndexOrThrow("Email"));
         t.matKhau = c.getString(c.getColumnIndexOrThrow("MatKhau"));
         t.soDienThoai = c.getString(c.getColumnIndexOrThrow("SoDienThoai"));
-        t.diaChi = c.getString(c.getColumnIndexOrThrow("DiaChi"));
-        t.vaiTro = c.getString(c.getColumnIndexOrThrow("VaiTro"));
         return t;
     }
 
-    public List<TaiKhoan> customers() {
-        List<TaiKhoan> list = new ArrayList<>();
-        Cursor c = db().rawQuery("SELECT * FROM TaiKhoan WHERE VaiTro = ? ORDER BY HoTen",
-                new String[]{TaiKhoan.KHACH_HANG});
-        try {
-            while (c.moveToNext()) {
-                list.add(readUser(c));
-            }
-        } finally {
-            c.close();
-        }
-        return list;
-    }
-
-    /** Find or create a customer contact for a counter-sale invoice. */
-    public int findOrCreateCounterCustomer(String name, String phone) {
-        String normalizedPhone = phone == null ? "" : phone.trim();
-        Cursor c = db().rawQuery("SELECT MaTaiKhoan FROM TaiKhoan "
-                        + "WHERE SoDienThoai = ? AND VaiTro = ? LIMIT 1",
-                new String[]{normalizedPhone, TaiKhoan.KHACH_HANG});
-        try {
-            if (c.moveToFirst()) {
-                int id = c.getInt(0);
-                ContentValues v = new ContentValues();
-                v.put("HoTen", name == null ? "" : name.trim());
-                db().update(DBHelper.T_TAIKHOAN, v, "MaTaiKhoan = ?",
-                        new String[]{String.valueOf(id)});
-                return id;
-            }
-        } finally {
-            c.close();
-        }
-        ContentValues values = new ContentValues();
-        values.put("HoTen", name == null ? "" : name.trim());
-        values.put("SoDienThoai", normalizedPhone);
-        values.put("MatKhau", "");
-        values.put("VaiTro", TaiKhoan.KHACH_HANG);
-        return (int) db().insert(DBHelper.T_TAIKHOAN, null, values);
-    }
-
-    // ======================================================== Sản phẩm (P2)
+    // ======================================================== Danh mục và sản phẩm
 
     public List<LoaiCay> categories() {
         List<LoaiCay> list = new ArrayList<>();
@@ -177,64 +102,6 @@ public class Repository {
             c.close();
         }
         return list;
-    }
-
-    public List<SanPham> products(String query, int maLoai, double giaTu, double giaDen, String sort) {
-        StringBuilder sql = new StringBuilder(
-                "SELECT s.*, l.TenLoai AS TenLoai FROM SanPham s JOIN LoaiCay l ON l.MaLoai = s.MaLoai "
-                        + "WHERE s.DangBan = 1");
-        List<String> args = new ArrayList<>();
-        if (query != null && !query.trim().isEmpty()) {
-            sql.append(" AND s.TenCay LIKE ?");
-            args.add("%" + query.trim() + "%");
-        }
-        if (maLoai > 0) {
-            sql.append(" AND s.MaLoai = ?");
-            args.add(String.valueOf(maLoai));
-        }
-        if (giaTu > 0) {
-            sql.append(" AND s.GiaBan >= ?");
-            args.add(String.valueOf(giaTu));
-        }
-        if (giaDen > 0) {
-            sql.append(" AND s.GiaBan <= ?");
-            args.add(String.valueOf(giaDen));
-        }
-        sql.append(" ORDER BY ").append(sortClause(sort));
-        return queryProducts(sql.toString(), args.toArray(new String[0]));
-    }
-
-    private static String sortClause(String sort) {
-        if ("gia_tang".equals(sort)) {
-            return "s.GiaBan ASC";
-        }
-        if ("gia_giam".equals(sort)) {
-            return "s.GiaBan DESC";
-        }
-        if ("moi_nhat".equals(sort)) {
-            return "s.MaSanPham DESC";
-        }
-        if ("ban_chay".equals(sort)) {
-            return "s.SoLuongTon ASC";
-        }
-        return "s.MaLoai ASC, s.MaSanPham ASC";
-    }
-
-    public List<SanPham> featured(int limit) {
-        return queryProducts("SELECT s.*, l.TenLoai AS TenLoai FROM SanPham s "
-                + "JOIN LoaiCay l ON l.MaLoai = s.MaLoai WHERE s.DangBan = 1 "
-                + "ORDER BY s.MaSanPham DESC LIMIT " + limit, new String[0]);
-    }
-
-    public List<SanPham> bestSelling(int limit) {
-        return queryProducts("SELECT s.*, l.TenLoai AS TenLoai, "
-                + "IFNULL(SUM(ct.SoLuong), 0) AS DaBan FROM SanPham s "
-                + "JOIN LoaiCay l ON l.MaLoai = s.MaLoai "
-                + "LEFT JOIN ChiTietDonHang ct ON ct.MaSanPham = s.MaSanPham "
-                + "LEFT JOIN DonHang d ON d.MaDonHang = ct.MaDonHang "
-                + "AND d.TrangThai IN ('DANG_GIAO','DA_GIAO') "
-                + "WHERE s.DangBan = 1 GROUP BY s.MaSanPham "
-                + "ORDER BY DaBan DESC, s.MaSanPham ASC LIMIT " + limit, new String[0]);
     }
 
     public List<SanPham> adminProducts(String query, int maLoai, String trangThai) {
@@ -324,160 +191,12 @@ public class Repository {
         }
     }
 
-    // ======================================================== Giỏ hàng (P3)
-
-    /** Giỏ là DonHang trạng thái GIO; tạo mới nếu khách chưa có. */
-    public long cartId(int maTaiKhoan) {
-        Cursor c = db().rawQuery("SELECT MaDonHang FROM DonHang WHERE MaTaiKhoan = ? AND TrangThai = 'GIO' "
-                + "ORDER BY MaDonHang DESC LIMIT 1", new String[]{String.valueOf(maTaiKhoan)});
-        long id = -1;
-        try {
-            if (c.moveToFirst()) {
-                id = c.getLong(0);
-            }
-        } finally {
-            c.close();
-        }
-        if (id > 0) {
-            return id;
-        }
-        ContentValues v = new ContentValues();
-        v.put("MaTaiKhoan", maTaiKhoan);
-        v.put("NgayDat", now());
-        v.put("TongTien", 0);
-        v.put("TrangThai", DonHang.GIO);
-        v.put("LoaiDonHang", DonHang.ONLINE);
-        v.put("PhuongThucThanhToan", "COD");
-        v.put("ThoiGianCapNhat", now());
-        v.put("LichSuTrangThai", DonHang.GIO + " | " + now() + " | Giỏ hàng mới");
-        return db().insert(DBHelper.T_DONHANG, null, v);
-    }
-
-    public List<ChiTietDonHang> cartLines(long maDonHang) {
-        return lines(maDonHang);
-    }
-
-    public void addToCart(int maTaiKhoan, int maSanPham, int soLuong) {
-        long cart = cartId(maTaiKhoan);
-        SanPham p = product(maSanPham);
-        if (p == null) {
-            return;
-        }
-        Cursor c = db().rawQuery("SELECT SoLuong FROM ChiTietDonHang WHERE MaDonHang = ? AND MaSanPham = ?",
-                new String[]{String.valueOf(cart), String.valueOf(maSanPham)});
-        int hienCo = 0;
-        try {
-            if (c.moveToFirst()) {
-                hienCo = c.getInt(0);
-            }
-        } finally {
-            c.close();
-        }
-        int moi = Math.min(hienCo + soLuong, Math.max(p.soLuongTon, 1));
-        setLineQty(cart, maSanPham, moi);
-    }
-
-    public void setLineQty(long maDonHang, int maSanPham, int soLuong) {
-        if (soLuong <= 0) {
-            removeLine(maDonHang, maSanPham);
-            return;
-        }
-        SanPham p = product(maSanPham);
-        if (p == null) {
-            return;
-        }
-        ContentValues v = new ContentValues();
-        v.put("MaDonHang", maDonHang);
-        v.put("MaSanPham", maSanPham);
-        v.put("SoLuong", soLuong);
-        v.put("DonGia", p.giaBan);
-        v.put("ThanhTien", soLuong * p.giaBan);
-        db().insertWithOnConflict(DBHelper.T_CHITIET, null, v, SQLiteDatabase.CONFLICT_REPLACE);
-        refreshCartTotal(maDonHang);
-    }
-
-    public void removeLine(long maDonHang, int maSanPham) {
-        db().delete(DBHelper.T_CHITIET, "MaDonHang = ? AND MaSanPham = ?",
-                new String[]{String.valueOf(maDonHang), String.valueOf(maSanPham)});
-        refreshCartTotal(maDonHang);
-    }
-
-    public int cartCount(int maTaiKhoan) {
-        Cursor c = db().rawQuery("SELECT IFNULL(SUM(ct.SoLuong),0) FROM ChiTietDonHang ct "
-                + "JOIN DonHang d ON d.MaDonHang = ct.MaDonHang "
-                + "WHERE d.MaTaiKhoan = ? AND d.TrangThai = 'GIO'",
-                new String[]{String.valueOf(maTaiKhoan)});
-        try {
-            return c.moveToFirst() ? c.getInt(0) : 0;
-        } finally {
-            c.close();
-        }
-    }
-
-    public double linesTotal(long maDonHang) {
-        Cursor c = db().rawQuery("SELECT IFNULL(SUM(ThanhTien),0) FROM ChiTietDonHang WHERE MaDonHang = ?",
-                new String[]{String.valueOf(maDonHang)});
-        try {
-            return c.moveToFirst() ? c.getDouble(0) : 0;
-        } finally {
-            c.close();
-        }
-    }
-
-    private void refreshCartTotal(long maDonHang) {
-        ContentValues v = new ContentValues();
-        v.put("TongTien", linesTotal(maDonHang));
-        v.put("ThoiGianCapNhat", now());
-        db().update(DBHelper.T_DONHANG, v, "MaDonHang = ?", new String[]{String.valueOf(maDonHang)});
-    }
-
-    // ======================================================== Đơn hàng (P4)
-
-    public long placeOrder(int maTaiKhoan, String diaChi, String ghiChu, String thanhToan) {
-        long cart = cartId(maTaiKhoan);
-        List<ChiTietDonHang> lines = cartLines(cart);
-        if (lines.isEmpty()) {
-            return -1;
-        }
-        for (ChiTietDonHang l : lines) {
-            if (l.soLuong > l.soLuongTon) {
-                return -2; // không đủ tồn kho
-            }
-        }
-        String t = now();
-        ContentValues v = new ContentValues();
-        v.put("TrangThai", DonHang.CHO_XAC_NHAN);
-        v.put("NgayDat", t);
-        v.put("ThoiGianCapNhat", t);
-        v.put("DiaChiGiao", diaChi);
-        v.put("GhiChu", ghiChu);
-        v.put("PhuongThucThanhToan", thanhToan);
-        v.put("TongTien", linesTotal(cart) + PHI_VAN_CHUYEN);
-        DonHang cu = order(cart);
-        String lichSu = (cu == null || cu.lichSuTrangThai == null || cu.lichSuTrangThai.isEmpty())
-                ? "" : cu.lichSuTrangThai + "\n";
-        v.put("LichSuTrangThai", lichSu + DonHang.CHO_XAC_NHAN + " | " + t + " | Khách đặt hàng");
-        db().update(DBHelper.T_DONHANG, v, "MaDonHang = ?", new String[]{String.valueOf(cart)});
-        truKho(cart);
-        return cart;
-    }
-
-    public List<DonHang> orders(int maTaiKhoan, String trangThai, String query) {
-        StringBuilder sql = new StringBuilder("SELECT d.*, t.HoTen AS TenKhach, "
-                + "(SELECT IFNULL(SUM(SoLuong),0) FROM ChiTietDonHang ct WHERE ct.MaDonHang = d.MaDonHang) AS SoSP "
-                + "FROM DonHang d JOIN TaiKhoan t ON t.MaTaiKhoan = d.MaTaiKhoan "
-                + "WHERE d.MaTaiKhoan = ? AND d.TrangThai <> 'GIO'");
-        List<String> args = new ArrayList<>();
-        args.add(String.valueOf(maTaiKhoan));
-        appendOrderFilters(sql, args, trangThai, query);
-        return queryOrders(sql.toString(), args.toArray(new String[0]));
-    }
+    // ======================================================== Hóa đơn
 
     public List<DonHang> adminOrders(String trangThai, String query) {
-        StringBuilder sql = new StringBuilder("SELECT d.*, t.HoTen AS TenKhach, "
+        StringBuilder sql = new StringBuilder("SELECT d.*, "
                 + "(SELECT IFNULL(SUM(SoLuong),0) FROM ChiTietDonHang ct WHERE ct.MaDonHang = d.MaDonHang) AS SoSP "
-                + "FROM DonHang d JOIN TaiKhoan t ON t.MaTaiKhoan = d.MaTaiKhoan "
-                + "WHERE d.TrangThai <> 'GIO'");
+                + "FROM DonHang d WHERE 1 = 1");
         List<String> args = new ArrayList<>();
         appendOrderFilters(sql, args, trangThai, query);
         return queryOrders(sql.toString(), args.toArray(new String[0]));
@@ -489,8 +208,8 @@ public class Repository {
             args.add(trangThai);
         }
         if (query != null && !query.trim().isEmpty()) {
-            sql.append(" AND (CAST(d.MaDonHang AS TEXT) LIKE ? OR t.HoTen LIKE ? "
-                    + "OR t.SoDienThoai LIKE ?)");
+            sql.append(" AND (CAST(d.MaDonHang AS TEXT) LIKE ? OR d.TenKhach LIKE ? "
+                    + "OR d.SoDienThoaiKhach LIKE ?)");
             args.add("%" + query.trim() + "%");
             args.add("%" + query.trim() + "%");
             args.add("%" + query.trim() + "%");
@@ -499,16 +218,16 @@ public class Repository {
     }
 
     public List<DonHang> recentOrders(int limit) {
-        return queryOrders("SELECT d.*, t.HoTen AS TenKhach, "
+        return queryOrders("SELECT d.*, "
                 + "(SELECT IFNULL(SUM(SoLuong),0) FROM ChiTietDonHang ct WHERE ct.MaDonHang = d.MaDonHang) AS SoSP "
-                + "FROM DonHang d JOIN TaiKhoan t ON t.MaTaiKhoan = d.MaTaiKhoan "
-                + "WHERE d.TrangThai <> 'GIO' ORDER BY d.ThoiGianCapNhat DESC, d.MaDonHang DESC LIMIT " + limit, new String[0]);
+                + "FROM DonHang d ORDER BY d.ThoiGianCapNhat DESC, d.MaDonHang DESC LIMIT " + limit,
+                new String[0]);
     }
 
     public DonHang order(long id) {
-        List<DonHang> list = queryOrders("SELECT d.*, t.HoTen AS TenKhach, "
+        List<DonHang> list = queryOrders("SELECT d.*, "
                 + "(SELECT IFNULL(SUM(SoLuong),0) FROM ChiTietDonHang ct WHERE ct.MaDonHang = d.MaDonHang) AS SoSP "
-                + "FROM DonHang d JOIN TaiKhoan t ON t.MaTaiKhoan = d.MaTaiKhoan WHERE d.MaDonHang = ?",
+                + "FROM DonHang d WHERE d.MaDonHang = ?",
                 new String[]{String.valueOf(id)});
         return list.isEmpty() ? null : list.get(0);
     }
@@ -562,26 +281,17 @@ public class Repository {
         d.ngayDat = c.getString(c.getColumnIndexOrThrow("NgayDat"));
         d.tongTien = c.getDouble(c.getColumnIndexOrThrow("TongTien"));
         d.trangThai = c.getString(c.getColumnIndexOrThrow("TrangThai"));
-        d.loaiDonHang = c.getString(c.getColumnIndexOrThrow("LoaiDonHang"));
         d.phuongThucThanhToan = c.getString(c.getColumnIndexOrThrow("PhuongThucThanhToan"));
-        d.diaChiGiao = c.getString(c.getColumnIndexOrThrow("DiaChiGiao"));
         d.ghiChu = c.getString(c.getColumnIndexOrThrow("GhiChu"));
         d.thoiGianCapNhat = c.getString(c.getColumnIndexOrThrow("ThoiGianCapNhat"));
         d.lichSuTrangThai = c.getString(c.getColumnIndexOrThrow("LichSuTrangThai"));
         d.tenKhach = c.getString(c.getColumnIndexOrThrow("TenKhach"));
+        d.soDienThoaiKhach = c.getString(c.getColumnIndexOrThrow("SoDienThoaiKhach"));
         int idx = c.getColumnIndex("SoSP");
         if (idx >= 0) {
             d.soSanPham = c.getInt(idx);
         }
         return d;
-    }
-
-    public boolean canCancel(DonHang d) {
-        return DonHang.CHO_XAC_NHAN.equals(d.trangThai);
-    }
-
-    public void cancelOrder(long maDonHang) {
-        updateStatus(maDonHang, DonHang.DA_HUY, "Khách huỷ đơn");
     }
 
     public void updateStatus(long maDonHang, String trangThai, String ghiChu) {
@@ -596,9 +306,6 @@ public class Repository {
         String lichSu = (d.lichSuTrangThai == null || d.lichSuTrangThai.isEmpty())
                 ? "" : d.lichSuTrangThai + "\n";
         v.put("LichSuTrangThai", lichSu + trangThai + " | " + t + " | " + ghiChu);
-        if (DonHang.DA_HUY.equals(trangThai) && DonHang.ONLINE.equals(d.loaiDonHang)) {
-            v.put("TongTien", linesTotal(maDonHang));
-        }
         db().update(DBHelper.T_DONHANG, v, "MaDonHang = ?", new String[]{String.valueOf(maDonHang)});
         if (DonHang.DA_HUY.equals(trangThai)) {
             hoanKho(maDonHang);
@@ -621,8 +328,9 @@ public class Repository {
                 new Object[]{maDonHang, maDonHang});
     }
 
-    /** UC24 — Quản trị viên tạo đơn trực tiếp cho khách tại quầy. */
-    public long createCounterOrder(int maTaiKhoan, List<ChiTietDonHang> chon, String thanhToan, String ghiChu) {
+    /** Tạo hóa đơn nội bộ, lưu thông tin liên hệ trực tiếp trên hóa đơn. */
+    public long createCounterOrder(int maTaiKhoan, String tenKhach, String soDienThoaiKhach,
+                                   List<ChiTietDonHang> chon, String thanhToan, String ghiChu) {
         if (chon == null || chon.isEmpty()) {
             return -1;
         }
@@ -635,14 +343,15 @@ public class Repository {
         String t = now();
         ContentValues v = new ContentValues();
         v.put("MaTaiKhoan", maTaiKhoan);
+        v.put("TenKhach", tenKhach == null ? "" : tenKhach.trim());
+        v.put("SoDienThoaiKhach", soDienThoaiKhach == null ? "" : soDienThoaiKhach.trim());
         v.put("NgayDat", t);
         v.put("TongTien", 0);
         v.put("TrangThai", DonHang.DA_GIAO);
-        v.put("LoaiDonHang", DonHang.TAI_QUAY);
         v.put("PhuongThucThanhToan", thanhToan);
         v.put("GhiChu", ghiChu);
         v.put("ThoiGianCapNhat", t);
-        v.put("LichSuTrangThai", DonHang.DA_GIAO + " | " + t + " | Tạo đơn tại quầy");
+        v.put("LichSuTrangThai", DonHang.DA_GIAO + " | " + t + " | Nhân viên tạo hóa đơn");
         long id = db().insert(DBHelper.T_DONHANG, null, v);
         double tong = 0;
         for (ChiTietDonHang l : chon) {
@@ -663,20 +372,7 @@ public class Repository {
         return id;
     }
 
-    /** "Mua lại": chép các dòng của đơn cũ vào giỏ hiện tại. */
-    public int reorder(int maTaiKhoan, long maDonHangCu) {
-        int added = 0;
-        for (ChiTietDonHang l : orderLines(maDonHangCu)) {
-            SanPham p = product(l.maSanPham);
-            if (p != null && p.dangBan && p.soLuongTon > 0) {
-                addToCart(maTaiKhoan, l.maSanPham, Math.min(l.soLuong, p.soLuongTon));
-                added++;
-            }
-        }
-        return added;
-    }
-
-    // ======================================================== Thống kê (P5)
+    // ======================================================== Thống kê
 
     public static class ThongKe {
         public double doanhThu;
@@ -782,7 +478,7 @@ public class Repository {
     }
 
     public int countOrders() {
-        return scalar("SELECT COUNT(*) FROM DonHang WHERE TrangThai <> 'GIO'");
+        return scalar("SELECT COUNT(*) FROM DonHang");
     }
 
     public int totalStock() {
@@ -802,102 +498,6 @@ public class Repository {
         Cursor c = db().rawQuery(sql, null);
         try {
             return c.moveToFirst() ? c.getInt(0) : 0;
-        } finally {
-            c.close();
-        }
-    }
-
-    // ======================================================== Trò chuyện (P6)
-
-    public long conversationForCustomer(int maTaiKhoan) {
-        Cursor c = db().rawQuery("SELECT MaCuocTroChuyen FROM CuocTroChuyen "
-                + "WHERE MaTaiKhoanKhachHang = ? ORDER BY MaCuocTroChuyen DESC LIMIT 1",
-                new String[]{String.valueOf(maTaiKhoan)});
-        long id = -1;
-        try {
-            if (c.moveToFirst()) {
-                id = c.getLong(0);
-            }
-        } finally {
-            c.close();
-        }
-        if (id > 0) {
-            return id;
-        }
-        ContentValues v = new ContentValues();
-        v.put("MaTaiKhoanKhachHang", maTaiKhoan);
-        v.put("MaTaiKhoanQuanTriVien", 1);
-        v.put("NgayTao", now());
-        v.put("ThoiGianCapNhat", now());
-        return db().insert(DBHelper.T_CUOCTROCHUYEN, null, v);
-    }
-
-    public List<TinNhan> messages(long maCuocTroChuyen) {
-        List<TinNhan> list = new ArrayList<>();
-        Cursor c = db().rawQuery("SELECT * FROM TinNhan WHERE MaCuocTroChuyen = ? ORDER BY MaTinNhan",
-                new String[]{String.valueOf(maCuocTroChuyen)});
-        try {
-            while (c.moveToNext()) {
-                TinNhan t = new TinNhan();
-                t.maTinNhan = c.getInt(c.getColumnIndexOrThrow("MaTinNhan"));
-                t.maCuocTroChuyen = c.getInt(c.getColumnIndexOrThrow("MaCuocTroChuyen"));
-                t.maTaiKhoanGui = c.getInt(c.getColumnIndexOrThrow("MaTaiKhoanGui"));
-                t.noiDung = c.getString(c.getColumnIndexOrThrow("NoiDung"));
-                t.thoiGianGui = c.getString(c.getColumnIndexOrThrow("ThoiGianGui"));
-                t.trangThai = c.getString(c.getColumnIndexOrThrow("TrangThai"));
-                list.add(t);
-            }
-        } finally {
-            c.close();
-        }
-        return list;
-    }
-
-    public void sendMessage(long maCuocTroChuyen, int maNguoiGui, String noiDung) {
-        ContentValues v = new ContentValues();
-        v.put("MaCuocTroChuyen", maCuocTroChuyen);
-        v.put("MaTaiKhoanGui", maNguoiGui);
-        v.put("NoiDung", noiDung);
-        v.put("ThoiGianGui", now());
-        v.put("TrangThai", "DA_GUI");
-        db().insert(DBHelper.T_TINNHAN, null, v);
-        ContentValues upd = new ContentValues();
-        upd.put("ThoiGianCapNhat", now());
-        db().update(DBHelper.T_CUOCTROCHUYEN, upd, "MaCuocTroChuyen = ?",
-                new String[]{String.valueOf(maCuocTroChuyen)});
-    }
-
-    public List<CuocTroChuyen> conversations() {
-        List<CuocTroChuyen> list = new ArrayList<>();
-        Cursor c = db().rawQuery("SELECT ct.*, tk.HoTen AS TenKhach, "
-                + "(SELECT NoiDung FROM TinNhan tn WHERE tn.MaCuocTroChuyen = ct.MaCuocTroChuyen "
-                + "ORDER BY tn.MaTinNhan DESC LIMIT 1) AS TinNhanCuoi "
-                + "FROM CuocTroChuyen ct JOIN TaiKhoan tk ON tk.MaTaiKhoan = ct.MaTaiKhoanKhachHang "
-                + "ORDER BY ct.ThoiGianCapNhat DESC", null);
-        try {
-            while (c.moveToNext()) {
-                CuocTroChuyen cv = new CuocTroChuyen();
-                cv.maCuocTroChuyen = c.getInt(c.getColumnIndexOrThrow("MaCuocTroChuyen"));
-                cv.maTaiKhoanKhachHang = c.getInt(c.getColumnIndexOrThrow("MaTaiKhoanKhachHang"));
-                cv.maTaiKhoanQuanTriVien = c.getInt(c.getColumnIndexOrThrow("MaTaiKhoanQuanTriVien"));
-                cv.ngayTao = c.getString(c.getColumnIndexOrThrow("NgayTao"));
-                cv.thoiGianCapNhat = c.getString(c.getColumnIndexOrThrow("ThoiGianCapNhat"));
-                cv.tenKhach = c.getString(c.getColumnIndexOrThrow("TenKhach"));
-                cv.tinNhanCuoi = c.getString(c.getColumnIndexOrThrow("TinNhanCuoi"));
-                list.add(cv);
-            }
-        } finally {
-            c.close();
-        }
-        return list;
-    }
-
-    public String tenKhachCuaCuocTroChuyen(long maCuocTroChuyen) {
-        Cursor c = db().rawQuery("SELECT tk.HoTen FROM CuocTroChuyen ct "
-                + "JOIN TaiKhoan tk ON tk.MaTaiKhoan = ct.MaTaiKhoanKhachHang WHERE ct.MaCuocTroChuyen = ?",
-                new String[]{String.valueOf(maCuocTroChuyen)});
-        try {
-            return c.moveToFirst() ? c.getString(0) : "Khách hàng";
         } finally {
             c.close();
         }

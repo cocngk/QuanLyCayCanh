@@ -19,6 +19,7 @@ import com.example.quanlycaycanh.data.ChiTietDonHang;
 import com.example.quanlycaycanh.data.Repository;
 import com.example.quanlycaycanh.data.SanPham;
 import com.example.quanlycaycanh.data.LoaiCay;
+import com.example.quanlycaycanh.data.Session;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.textfield.TextInputEditText;
@@ -26,7 +27,7 @@ import com.google.android.material.textfield.TextInputEditText;
 import java.util.ArrayList;
 import java.util.List;
 
-/** UC24 — Quản trị viên tạo đơn trực tiếp cho khách mua tại quầy. */
+/** Tạo hóa đơn cho giao dịch tại quầy. */
 public class CreateOrderActivity extends AppCompatActivity {
 
     private Repository repo;
@@ -131,13 +132,9 @@ public class CreateOrderActivity extends AppCompatActivity {
             Ui.toast(this, "Chọn ít nhất một sản phẩm");
             return;
         }
-        int maKhach = repo.findOrCreateCounterCustomer(tenKhach, soDienThoai);
-        if (maKhach <= 0) {
-            Ui.toast(this, "Không lưu được thông tin khách hàng");
-            return;
-        }
         String thanhToan = spThanhToan.getSelectedItemPosition() == 0 ? "Tiền mặt" : "Chuyển khoản";
-        long maDon = repo.createCounterOrder(maKhach, ds, thanhToan, "Khách mua tại cửa hàng");
+        long maDon = repo.createCounterOrder(new Session(this).maTaiKhoan(),
+                tenKhach, soDienThoai, ds, thanhToan, "Bán tại cửa hàng");
         if (maDon == -1) {
             Ui.toast(this, "Chưa chọn sản phẩm");
             return;

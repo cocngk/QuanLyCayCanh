@@ -16,7 +16,7 @@ import com.example.quanlycaycanh.data.Repository;
 import java.util.ArrayList;
 import java.util.List;
 
-/** Dòng đơn hàng dùng cho cả khách hàng và quản trị. */
+/** Dòng hóa đơn trong giao diện quản trị. */
 public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.VH> {
 
     public interface OnOrderClick {
@@ -25,10 +25,8 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.VH> {
 
     private final List<DonHang> items = new ArrayList<>();
     private final OnOrderClick listener;
-    private final boolean hienKhach;
 
-    public OrderAdapter(boolean hienKhach, OnOrderClick listener) {
-        this.hienKhach = hienKhach;
+    public OrderAdapter(OnOrderClick listener) {
         this.listener = listener;
     }
 
@@ -53,10 +51,11 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.VH> {
         h.tvMaDon.setText("#" + d.maDonHang);
         Ui.ganNhanTrangThai(h.itemView.getContext(), h.tvTrangThai, d.trangThai);
         String thoiGian = Repository.dinhDangThoiGian(d.ngayDat);
-        h.tvThoiGian.setText(thoiGian + " · " + d.soSanPham + " sản phẩm"
-                + (DonHang.TAI_QUAY.equals(d.loaiDonHang) ? " · Tại quầy" : ""));
+        h.tvThoiGian.setText(thoiGian + " · " + d.soSanPham + " sản phẩm");
         h.tvTongTien.setText(Ui.vnd(d.tongTien));
-        h.tvKhach.setText(hienKhach ? (d.tenKhach == null ? "" : d.tenKhach) : "Xem chi tiết ›");
+        String name = d.tenKhach == null || d.tenKhach.trim().isEmpty()
+                ? "Khách mua lẻ" : d.tenKhach;
+        h.tvKhach.setText(name);
         h.itemView.setOnClickListener(v -> listener.onOpen(d));
     }
 

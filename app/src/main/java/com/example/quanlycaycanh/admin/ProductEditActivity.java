@@ -26,7 +26,7 @@ import com.google.android.material.textfield.TextInputEditText;
 import java.util.ArrayList;
 import java.util.List;
 
-/** UC12 / UC12a / UC13 — Thêm, sửa sản phẩm và cập nhật tồn kho. */
+/** Thêm, sửa sản phẩm và cập nhật tồn kho. */
 public class ProductEditActivity extends AppCompatActivity {
 
     public static final String EXTRA_MA_SAN_PHAM = "ma_san_pham";

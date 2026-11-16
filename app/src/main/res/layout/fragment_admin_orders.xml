@@ -44,7 +44,7 @@
         android:background="@drawable/bg_search"
         android:drawableStart="@drawable/ic_search"
         android:drawablePadding="10dp"
-        android:hint="Tìm theo mã đơn hoặc tên khách"
+        android:hint="Tìm mã hóa đơn, tên hoặc số điện thoại khách"
         android:inputType="text"
         android:maxLines="1"
         android:paddingHorizontal="14dp"

@@ -31,7 +31,7 @@ public class AdminActivity extends AppCompatActivity {
         Repository repo = new Repository(this);
         Session session = new Session(this);
         TaiKhoan user = repo.user(session.maTaiKhoan());
-        if (user == null || !user.isAdmin()) {
+        if (user == null) {
             startActivity(new Intent(this, LoginActivity.class));
             finish();
             return;

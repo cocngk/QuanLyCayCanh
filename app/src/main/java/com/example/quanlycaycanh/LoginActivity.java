@@ -37,8 +37,8 @@ public class LoginActivity extends AppCompatActivity {
 
         if (session.daDangNhap() && session.ghiNho()) {
             TaiKhoan tk = repo.user(session.maTaiKhoan());
-            if (tk != null && tk.isAdmin()) {
-                moTrangChu(tk);
+            if (tk != null) {
+                moTrangChu();
                 return;
             }
             session.dangXuat();
@@ -59,19 +59,11 @@ public class LoginActivity extends AppCompatActivity {
             Ui.toast(this, "Sai tài khoản hoặc mật khẩu");
             return;
         }
-        if (!tk.isAdmin()) {
-            Ui.toast(this, "Ứng dụng chỉ dành cho tài khoản quản trị viên");
-            return;
-        }
         session.dangNhap(tk.maTaiKhoan, cbGhiNho.isChecked());
-        moTrangChu(tk);
+        moTrangChu();
     }
 
-    private void moTrangChu(TaiKhoan tk) {
-        if (!tk.isAdmin()) {
-            session.dangXuat();
-            return;
-        }
+    private void moTrangChu() {
         Intent i = new Intent(this, AdminActivity.class);
         i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(i);

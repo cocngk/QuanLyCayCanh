@@ -68,16 +68,14 @@ public final class Ui {
             return "";
         }
         switch (trangThai) {
-            case DonHang.GIO:
-                return "Giỏ nháp";
             case DonHang.CHO_XAC_NHAN:
-                return "Chờ xác nhận";
+                return "Chờ xử lý";
             case DonHang.DANG_GIAO:
-                return "Đang giao";
+                return "Đang xử lý";
             case DonHang.DA_GIAO:
-                return "Đã giao";
+                return "Đã hoàn tất";
             case DonHang.DA_HUY:
-                return "Đã huỷ";
+                return "Đã hủy";
             default:
                 return trangThai;
         }

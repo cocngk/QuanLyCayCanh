@@ -71,7 +71,7 @@ public class AdminHomeFragment extends Fragment {
         RecyclerView rv = v.findViewById(R.id.rvDonGanDay);
         rv.setLayoutManager(new LinearLayoutManager(requireContext()));
         rv.setNestedScrollingEnabled(false);
-        orderAdapter = new OrderAdapter(true, don -> {
+        orderAdapter = new OrderAdapter(don -> {
             Intent i = new Intent(requireContext(), OrderDetailActivity.class);
             i.putExtra(OrderDetailActivity.EXTRA_MA_DON, (long) don.maDonHang);
             startActivity(i);

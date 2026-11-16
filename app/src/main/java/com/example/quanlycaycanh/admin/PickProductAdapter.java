@@ -17,7 +17,7 @@ import com.example.quanlycaycanh.data.SanPham;
 import java.util.ArrayList;
 import java.util.List;
 
-/** Chọn số lượng từng sản phẩm khi tạo đơn tại quầy (UC24). */
+/** Chọn số lượng sản phẩm khi lập hóa đơn tại quầy. */
 public class PickProductAdapter extends RecyclerView.Adapter<PickProductAdapter.VH> {
 
     public interface OnQuantityChange {
