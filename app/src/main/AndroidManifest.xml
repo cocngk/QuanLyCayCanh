@@ -21,12 +21,8 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".RegisterActivity" android:windowSoftInputMode="adjustResize" />
-        <activity android:name=".customer.CustomerActivity" />
-        <activity android:name=".customer.ProductDetailActivity" />
-        <activity android:name=".customer.OrderDetailActivity" />
-        <activity android:name=".customer.ChatActivity" android:windowSoftInputMode="adjustResize" />
         <activity android:name=".admin.AdminActivity" />
+        <activity android:name=".admin.OrderDetailActivity" />
         <activity android:name=".admin.ProductEditActivity" android:windowSoftInputMode="adjustResize" />
         <activity android:name=".admin.CreateOrderActivity" android:windowSoftInputMode="adjustResize" />
     </application>

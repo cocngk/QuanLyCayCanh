@@ -4,6 +4,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -50,9 +51,7 @@ public class AdminProductAdapter extends RecyclerView.Adapter<AdminProductAdapte
     @Override
     public void onBindViewHolder(@NonNull VH h, int position) {
         SanPham p = items.get(position);
-        h.tvEmoji.setText(p.hinhAnh == null ? "🪴" : p.hinhAnh);
-        h.tvEmoji.setBackground(Ui.boTron(h.itemView.getContext(),
-                Ui.nenDanhMuc(h.itemView.getContext(), p.maLoai), 14));
+        Ui.hienAnhCay(h.itemView.getContext(), p.hinhAnh, h.imgPlant, h.tvEmoji, p.maLoai);
         h.tvTen.setText(p.tenCay);
         h.tvLoaiGia.setText(p.tenLoai + " · " + Ui.vnd(p.giaBan));
         String trangThai = p.dangBan ? "Đang bán" : "Ngừng bán";
@@ -71,6 +70,7 @@ public class AdminProductAdapter extends RecyclerView.Adapter<AdminProductAdapte
 
     static class VH extends RecyclerView.ViewHolder {
         final TextView tvEmoji;
+        final ImageView imgPlant;
         final TextView tvTen;
         final TextView tvLoaiGia;
         final TextView tvTon;
@@ -80,6 +80,7 @@ public class AdminProductAdapter extends RecyclerView.Adapter<AdminProductAdapte
         VH(@NonNull View v) {
             super(v);
             tvEmoji = v.findViewById(R.id.tvEmoji);
+            imgPlant = v.findViewById(R.id.imgPlant);
             tvTen = v.findViewById(R.id.tvTen);
             tvLoaiGia = v.findViewById(R.id.tvLoaiGia);
             tvTon = v.findViewById(R.id.tvTon);

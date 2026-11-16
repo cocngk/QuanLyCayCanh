@@ -1,4 +1,4 @@
-package com.example.quanlycaycanh.customer;
+package com.example.quanlycaycanh.admin;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -15,19 +15,14 @@ import com.example.quanlycaycanh.Ui;
 import com.example.quanlycaycanh.data.ChiTietDonHang;
 import com.example.quanlycaycanh.data.DonHang;
 import com.example.quanlycaycanh.data.Repository;
-import com.example.quanlycaycanh.data.Session;
 import com.google.android.material.button.MaterialButton;
 
-/** 5.6 (phụ) — Chi tiết đơn hàng, dùng chung cho khách hàng và quản trị viên. */
+/** Chi tiết hóa đơn và cập nhật trạng thái cho quản trị viên. */
 public class OrderDetailActivity extends AppCompatActivity {
 
     public static final String EXTRA_MA_DON = "ma_don";
-    public static final String EXTRA_ADMIN = "admin";
-
     private Repository repo;
-    private Session session;
     private long maDon;
-    private boolean admin;
     private DonHang don;
 
     @Override
@@ -37,9 +32,7 @@ public class OrderDetailActivity extends AppCompatActivity {
         Ui.anToan(this);
 
         repo = new Repository(this);
-        session = new Session(this);
         maDon = getIntent().getLongExtra(EXTRA_MA_DON, -1);
-        admin = getIntent().getBooleanExtra(EXTRA_ADMIN, false);
 
         ImageButton btnQuayLai = findViewById(R.id.btnQuayLai);
         btnQuayLai.setOnClickListener(v -> finish());
@@ -102,7 +95,7 @@ public class OrderDetailActivity extends AppCompatActivity {
         TextView tvLichSu = findViewById(R.id.tvLichSu);
         TextView tvTieuDe = findViewById(R.id.tvTieuDe);
 
-        tvTieuDe.setText(admin ? "Chi tiết đơn (quản trị)" : "Chi tiết đơn hàng");
+        tvTieuDe.setText("Chi tiết hóa đơn");
         Ui.ganNhanTrangThai(this, tvTrangThai, don.trangThai);
         tvMaDon.setText("#" + don.maDonHang + " · " + Repository.dinhDangThoiGian(don.ngayDat)
                 + (DonHang.TAI_QUAY.equals(don.loaiDonHang) ? " · Tại quầy" : ""));
@@ -120,7 +113,9 @@ public class OrderDetailActivity extends AppCompatActivity {
             TextView ten = row.findViewById(R.id.tvTen);
             TextView dongGia = row.findViewById(R.id.tvDongGia);
             TextView thanhTien = row.findViewById(R.id.tvThanhTien);
-            emoji.setText(l.hinhAnh == null ? "🪴" : l.hinhAnh);
+            String icon = l.hinhAnh != null && !l.hinhAnh.startsWith("content://")
+                    && !l.hinhAnh.startsWith("file://") ? l.hinhAnh : "🌿";
+            emoji.setText(icon);
             ten.setText(l.tenCay);
             dongGia.setText(Ui.vnd(l.donGia) + " × " + l.soLuong);
             thanhTien.setText(Ui.vnd(l.thanhTien));
@@ -139,30 +134,10 @@ public class OrderDetailActivity extends AppCompatActivity {
         MaterialButton btnMuaLai = findViewById(R.id.btnMuaLai);
         MaterialButton btnCapNhat = findViewById(R.id.btnCapNhat);
 
-        btnHuy.setVisibility(!admin && repo.canCancel(don) ? View.VISIBLE : View.GONE);
-        btnMuaLai.setVisibility(!admin && don.daDatHang() ? View.VISIBLE : View.GONE);
-        btnCapNhat.setVisibility(admin && !DonHang.DA_GIAO.equals(don.trangThai)
+        btnHuy.setVisibility(View.GONE);
+        btnMuaLai.setVisibility(View.GONE);
+        btnCapNhat.setVisibility(!DonHang.DA_GIAO.equals(don.trangThai)
                 && !DonHang.DA_HUY.equals(don.trangThai) ? View.VISIBLE : View.GONE);
-
-        btnHuy.setOnClickListener(v -> new AlertDialog.Builder(this)
-                .setMessage("Huỷ đơn #" + don.maDonHang + "?")
-                .setNegativeButton("Không", null)
-                .setPositiveButton("Huỷ đơn", (d, w) -> {
-                    repo.cancelOrder(don.maDonHang);
-                    Ui.toast(this, "Đã huỷ đơn hàng");
-                    onResume();
-                })
-                .show());
-
-        btnMuaLai.setOnClickListener(v -> {
-            int added = repo.reorder(session.maTaiKhoan(), don.maDonHang);
-            if (added == 0) {
-                Ui.toast(this, "Không còn sản phẩm nào khả dụng để mua lại");
-            } else {
-                Ui.toast(this, "Đã thêm " + added + " sản phẩm vào giỏ");
-                CustomerActivity.moGioHang(this);
-            }
-        });
 
         btnCapNhat.setOnClickListener(v -> chonTrangThai());
     }

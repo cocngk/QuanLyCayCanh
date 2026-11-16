@@ -1,4 +1,4 @@
-package com.example.quanlycaycanh.customer;
+package com.example.quanlycaycanh.admin;
 
 import android.view.LayoutInflater;
 import android.view.View;

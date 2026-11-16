@@ -134,6 +134,32 @@ public class Repository {
         return list;
     }
 
+    /** Find or create a customer contact for a counter-sale invoice. */
+    public int findOrCreateCounterCustomer(String name, String phone) {
+        String normalizedPhone = phone == null ? "" : phone.trim();
+        Cursor c = db().rawQuery("SELECT MaTaiKhoan FROM TaiKhoan "
+                        + "WHERE SoDienThoai = ? AND VaiTro = ? LIMIT 1",
+                new String[]{normalizedPhone, TaiKhoan.KHACH_HANG});
+        try {
+            if (c.moveToFirst()) {
+                int id = c.getInt(0);
+                ContentValues v = new ContentValues();
+                v.put("HoTen", name == null ? "" : name.trim());
+                db().update(DBHelper.T_TAIKHOAN, v, "MaTaiKhoan = ?",
+                        new String[]{String.valueOf(id)});
+                return id;
+            }
+        } finally {
+            c.close();
+        }
+        ContentValues values = new ContentValues();
+        values.put("HoTen", name == null ? "" : name.trim());
+        values.put("SoDienThoai", normalizedPhone);
+        values.put("MatKhau", "");
+        values.put("VaiTro", TaiKhoan.KHACH_HANG);
+        return (int) db().insert(DBHelper.T_TAIKHOAN, null, values);
+    }
+
     // ======================================================== Sản phẩm (P2)
 
     public List<LoaiCay> categories() {
@@ -463,7 +489,9 @@ public class Repository {
             args.add(trangThai);
         }
         if (query != null && !query.trim().isEmpty()) {
-            sql.append(" AND (CAST(d.MaDonHang AS TEXT) LIKE ? OR t.HoTen LIKE ?)");
+            sql.append(" AND (CAST(d.MaDonHang AS TEXT) LIKE ? OR t.HoTen LIKE ? "
+                    + "OR t.SoDienThoai LIKE ?)");
+            args.add("%" + query.trim() + "%");
             args.add("%" + query.trim() + "%");
             args.add("%" + query.trim() + "%");
         }
@@ -755,6 +783,10 @@ public class Repository {
 
     public int countOrders() {
         return scalar("SELECT COUNT(*) FROM DonHang WHERE TrangThai <> 'GIO'");
+    }
+
+    public int totalStock() {
+        return scalar("SELECT IFNULL(SUM(SoLuongTon), 0) FROM SanPham WHERE DangBan = 1");
     }
 
     public double totalRevenue() {

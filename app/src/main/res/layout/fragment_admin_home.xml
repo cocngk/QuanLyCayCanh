@@ -27,31 +27,86 @@
                     android:id="@+id/tvChao"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Xin chào, Duy"
+                    android:text="Trang chủ"
                     android:textColor="@color/brown_dark"
-                    android:textSize="22sp"
+                    android:textSize="23sp"
                     android:textStyle="bold" />
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Bảng điều khiển cửa hàng hôm nay"
+                    android:text="Tổng quan hoạt động cửa hàng"
                     android:textColor="@color/muted"
                     android:textSize="13sp" />
             </LinearLayout>
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnDangXuat"
-                style="@style/Widget.Material3.Button.TextButton"
-                android:layout_width="wrap_content"
-                android:layout_height="40dp"
-                android:insetTop="0dp"
-                android:insetBottom="0dp"
-                android:text="Đăng xuất"
-                android:textAllCaps="false"
-                android:textColor="@color/red"
-                android:textSize="12sp" />
+            <ImageButton
+                android:id="@+id/btnTaiKhoanNhanh"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:background="@drawable/bg_soft"
+                android:contentDescription="Tài khoản"
+                android:padding="10dp"
+                android:src="@drawable/ic_person"
+                app:tint="@color/green" />
         </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="132dp"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/bg_banner"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:padding="18dp">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Quản lý cửa hàng\ncây cảnh"
+                    android:textColor="@color/brown_dark"
+                    android:textSize="21sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:text="Theo dõi sản phẩm, hóa đơn và doanh thu"
+                    android:textColor="@color/brown_dark"
+                    android:textSize="12sp" />
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="92dp"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:text="🪴"
+                android:textSize="58sp" />
+        </LinearLayout>
+
+        <EditText
+            android:id="@+id/edTimNhanh"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginTop="14dp"
+            android:background="@drawable/bg_search"
+            android:drawableStart="@drawable/ic_search"
+            android:drawablePadding="10dp"
+            android:hint="Tìm cây cảnh trong kho..."
+            android:inputType="text"
+            android:imeOptions="actionSearch"
+            android:maxLines="1"
+            android:paddingHorizontal="14dp"
+            android:textColor="@color/brown_dark"
+            android:textColorHint="@color/muted"
+            android:textSize="14sp" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -61,52 +116,54 @@
 
             <LinearLayout
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="76dp"
                 android:layout_weight="1"
                 android:background="@drawable/bg_soft"
+                android:gravity="center_vertical"
                 android:orientation="vertical"
-                android:padding="14dp">
+                android:paddingHorizontal="14dp">
 
                 <TextView
                     android:id="@+id/tvTongSanPham"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="12"
-                    android:textColor="@color/brown_dark"
-                    android:textSize="22sp"
+                    android:text="0"
+                    android:textColor="@color/green"
+                    android:textSize="23sp"
                     android:textStyle="bold" />
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Tổng sản phẩm"
-                    android:textColor="@color/muted"
+                    android:text="Cây cảnh"
+                    android:textColor="@color/brown_dark"
                     android:textSize="12sp" />
             </LinearLayout>
 
             <LinearLayout
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
+                android:layout_height="76dp"
+                android:layout_marginStart="8dp"
                 android:layout_weight="1"
                 android:background="@drawable/bg_soft"
+                android:gravity="center_vertical"
                 android:orientation="vertical"
-                android:padding="14dp">
+                android:paddingHorizontal="14dp">
 
                 <TextView
-                    android:id="@+id/tvTongDon"
+                    android:id="@+id/tvTonKho"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="8"
-                    android:textColor="@color/brown_dark"
-                    android:textSize="22sp"
+                    android:text="0"
+                    android:textColor="@color/amber"
+                    android:textSize="23sp"
                     android:textStyle="bold" />
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Tổng đơn hàng"
-                    android:textColor="@color/muted"
+                    android:text="Tồn kho"
+                    android:textColor="@color/brown_dark"
                     android:textSize="12sp" />
             </LinearLayout>
         </LinearLayout>
@@ -114,67 +171,148 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="8dp"
             android:orientation="horizontal">
 
             <LinearLayout
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="76dp"
                 android:layout_weight="1"
                 android:background="@drawable/bg_soft"
+                android:gravity="center_vertical"
                 android:orientation="vertical"
-                android:padding="14dp">
+                android:paddingHorizontal="14dp">
+
+                <TextView
+                    android:id="@+id/tvTongDon"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="0"
+                    android:textColor="@color/blue"
+                    android:textSize="23sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Hóa đơn"
+                    android:textColor="@color/brown_dark"
+                    android:textSize="12sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="76dp"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_soft"
+                android:gravity="center_vertical"
+                android:orientation="vertical"
+                android:paddingHorizontal="14dp">
 
                 <TextView
                     android:id="@+id/tvDoanhThu"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="1.500.000 ₫"
+                    android:text="0 ₫"
                     android:textColor="@color/green"
-                    android:textSize="20sp"
+                    android:textSize="18sp"
                     android:textStyle="bold" />
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Doanh thu (đã giao)"
-                    android:textColor="@color/muted"
-                    android:textSize="12sp" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:layout_weight="1"
-                android:background="@drawable/bg_soft"
-                android:orientation="vertical"
-                android:padding="14dp">
-
-                <TextView
-                    android:id="@+id/tvTonThap"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="4"
-                    android:textColor="@color/amber"
-                    android:textSize="22sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Tồn kho thấp"
-                    android:textColor="@color/muted"
+                    android:text="Doanh thu"
+                    android:textColor="@color/brown_dark"
                     android:textSize="12sp" />
             </LinearLayout>
         </LinearLayout>
 
         <TextView
+            style="@style/Text.Section"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
-            android:text="Đơn hàng gần đây"
-            style="@style/Text.Section" />
+            android:text="Chức năng nhanh" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:orientation="horizontal">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnQuanLyCayNhanh"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_height="72dp"
+                android:layout_weight="1"
+                android:text="🌿\nQuản lý cây"
+                android:textAllCaps="false"
+                android:textColor="@color/brown_dark"
+                app:cornerRadius="16dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnTaoHoaDonNhanh"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_height="72dp"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:text="＋\nTạo hóa đơn"
+                android:textAllCaps="false"
+                android:textColor="@color/brown_dark"
+                app:cornerRadius="16dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnQuanLyHoaDonNhanh"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_height="72dp"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:text="▤\nHóa đơn"
+                android:textAllCaps="false"
+                android:textColor="@color/brown_dark"
+                app:cornerRadius="16dp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:orientation="horizontal">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnThongKeNhanh"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_height="64dp"
+                android:layout_weight="1"
+                android:text="▥  Thống kê"
+                android:textAllCaps="false"
+                android:textColor="@color/brown_dark"
+                app:cornerRadius="16dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnTaiKhoanNhanhText"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_height="64dp"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:text="👤  Tài khoản"
+                android:textAllCaps="false"
+                android:textColor="@color/brown_dark"
+                app:cornerRadius="16dp" />
+        </LinearLayout>
+
+        <TextView
+            style="@style/Text.Section"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="Hóa đơn gần đây" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvDonGanDay"
@@ -184,11 +322,11 @@
             android:nestedScrollingEnabled="false" />
 
         <TextView
+            style="@style/Text.Section"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:text="Sản phẩm sắp hết hàng"
-            style="@style/Text.Section" />
+            android:text="Cây sắp hết hàng" />
 
         <LinearLayout
             android:id="@+id/khungTonThap"

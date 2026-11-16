@@ -9,19 +9,20 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@color/brown"
         android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:padding="16dp">
+        android:padding="12dp">
 
         <ImageButton
             android:id="@+id/btnQuayLai"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:background="@drawable/bg_emoji"
+            android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="Quay lại"
             android:padding="9dp"
             android:src="@drawable/ic_back"
-            app:tint="@color/brown" />
+            app:tint="@color/white" />
 
         <TextView
             android:id="@+id/tvTieuDe"
@@ -30,7 +31,7 @@
             android:layout_marginStart="12dp"
             android:layout_weight="1"
             android:text="Thêm sản phẩm"
-            android:textColor="@color/brown_dark"
+            android:textColor="@color/white"
             android:textSize="18sp"
             android:textStyle="bold" />
     </LinearLayout>
@@ -77,19 +78,39 @@
                 android:background="@drawable/bg_search"
                 android:paddingHorizontal="12dp" />
 
-            <com.google.android.material.textfield.TextInputLayout
-                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+            <FrameLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:hint="Biểu tượng (emoji)">
+                android:layout_height="190dp"
+                android:layout_marginBottom="14dp"
+                android:background="@drawable/bg_soft">
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/edEmoji"
+                <ImageView
+                    android:id="@+id/imgAnhCay"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="text" />
-            </com.google.android.material.textfield.TextInputLayout>
+                    android:layout_height="match_parent"
+                    android:contentDescription="Ảnh cây cảnh"
+                    android:scaleType="centerCrop"
+                    android:visibility="gone" />
+
+                <TextView
+                    android:id="@+id/tvEmojiFallback"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:text="🪴"
+                    android:textSize="70sp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnChonAnh"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="48dp"
+                    android:layout_gravity="bottom|center_horizontal"
+                    android:layout_marginBottom="12dp"
+                    android:text="Chọn ảnh cây cảnh"
+                    android:textAllCaps="false"
+                    app:cornerRadius="14dp" />
+            </FrameLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"

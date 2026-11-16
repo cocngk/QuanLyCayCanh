@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -24,6 +25,7 @@ public class PickProductAdapter extends RecyclerView.Adapter<PickProductAdapter.
     }
 
     private final List<SanPham> items = new ArrayList<>();
+    private final List<SanPham> allItems = new ArrayList<>();
     private final SparseIntArray soLuong = new SparseIntArray();
     private final OnQuantityChange listener;
 
@@ -32,13 +34,23 @@ public class PickProductAdapter extends RecyclerView.Adapter<PickProductAdapter.
     }
 
     public void submit(List<SanPham> ds) {
+        allItems.clear();
         items.clear();
         soLuong.clear();
         if (ds != null) {
+            allItems.addAll(ds);
             items.addAll(ds);
         }
         notifyDataSetChanged();
         listener.onChanged();
+    }
+
+    public void filter(List<SanPham> ds) {
+        items.clear();
+        if (ds != null) {
+            items.addAll(ds);
+        }
+        notifyDataSetChanged();
     }
 
     public SparseIntArray soLuongDaChon() {
@@ -50,7 +62,7 @@ public class PickProductAdapter extends RecyclerView.Adapter<PickProductAdapter.
     }
 
     public List<SanPham> danhSach() {
-        return items;
+        return allItems;
     }
 
     @NonNull
@@ -64,9 +76,7 @@ public class PickProductAdapter extends RecyclerView.Adapter<PickProductAdapter.
     public void onBindViewHolder(@NonNull VH h, int position) {
         SanPham p = items.get(position);
         int sl = soLuong.get(p.maSanPham, 0);
-        h.tvEmoji.setText(p.hinhAnh == null ? "🪴" : p.hinhAnh);
-        h.tvEmoji.setBackground(Ui.boTron(h.itemView.getContext(),
-                Ui.nenDanhMuc(h.itemView.getContext(), p.maLoai), 12));
+        Ui.hienAnhCay(h.itemView.getContext(), p.hinhAnh, h.imgPlant, h.tvEmoji, p.maLoai);
         h.tvTen.setText(p.tenCay);
         h.tvGiaTon.setText(Ui.vnd(p.giaBan) + " · còn " + p.soLuongTon);
         h.tvSoLuong.setText(String.valueOf(sl));
@@ -101,6 +111,7 @@ public class PickProductAdapter extends RecyclerView.Adapter<PickProductAdapter.
 
     static class VH extends RecyclerView.ViewHolder {
         final TextView tvEmoji;
+        final ImageView imgPlant;
         final TextView tvTen;
         final TextView tvGiaTon;
         final TextView tvSoLuong;
@@ -110,6 +121,7 @@ public class PickProductAdapter extends RecyclerView.Adapter<PickProductAdapter.
         VH(@NonNull View v) {
             super(v);
             tvEmoji = v.findViewById(R.id.tvEmoji);
+            imgPlant = v.findViewById(R.id.imgPlant);
             tvTen = v.findViewById(R.id.tvTen);
             tvGiaTon = v.findViewById(R.id.tvGiaTon);
             tvSoLuong = v.findViewById(R.id.tvSoLuong);

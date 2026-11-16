@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -20,6 +21,11 @@ import com.example.quanlycaycanh.R;
 import com.example.quanlycaycanh.Ui;
 import com.example.quanlycaycanh.data.Repository;
 import com.example.quanlycaycanh.data.SanPham;
+import com.example.quanlycaycanh.data.LoaiCay;
+import com.google.android.material.chip.Chip;
+import com.google.android.material.chip.ChipGroup;
+
+import java.util.List;
 
 /** 5.7 (phụ) — Quản lý sản phẩm: tìm kiếm, thêm, sửa, ngừng bán. */
 public class AdminProductFragment extends Fragment {
@@ -27,6 +33,9 @@ public class AdminProductFragment extends Fragment {
     private Repository repo;
     private AdminProductAdapter adapter;
     private String tuKhoa = "";
+    private int maLoai = 0;
+    private TextView tvTongSanPham;
+    private EditText edTimSanPham;
 
     @Nullable
     @Override
@@ -38,6 +47,7 @@ public class AdminProductFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View v, @Nullable Bundle savedInstanceState) {
         repo = new Repository(requireContext());
+        tvTongSanPham = v.findViewById(R.id.tvTongSanPham);
 
         RecyclerView rv = v.findViewById(R.id.rvSanPham);
         rv.setLayoutManager(new LinearLayoutManager(requireContext()));
@@ -55,8 +65,14 @@ public class AdminProductFragment extends Fragment {
         });
         rv.setAdapter(adapter);
 
-        EditText edTim = v.findViewById(R.id.edTimSanPham);
-        edTim.addTextChangedListener(new TextWatcher() {
+        ChipGroup categories = v.findViewById(R.id.chipLoaiCay);
+        themChip(categories, "Tất cả", 0);
+        for (LoaiCay category : repo.categories()) {
+            themChip(categories, category.tenLoai, category.maLoai);
+        }
+
+        edTimSanPham = v.findViewById(R.id.edTimSanPham);
+        edTimSanPham.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
             }
@@ -86,7 +102,28 @@ public class AdminProductFragment extends Fragment {
         if (!isAdded() || adapter == null) {
             return;
         }
-        adapter.submit(repo.adminProducts(tuKhoa, 0, ""));
+        List<SanPham> products = repo.adminProducts(tuKhoa, maLoai, "");
+        adapter.submit(products);
+        tvTongSanPham.setText("Tổng: " + products.size() + " cây cảnh");
+    }
+
+    private void themChip(ChipGroup group, String label, int categoryId) {
+        Chip chip = new Chip(requireContext());
+        chip.setText(label);
+        chip.setCheckable(true);
+        chip.setChecked(categoryId == maLoai);
+        chip.setOnClickListener(v -> {
+            maLoai = categoryId;
+            nap();
+        });
+        group.addView(chip);
+    }
+
+    public void setSearchQuery(String query) {
+        if (edTimSanPham != null) {
+            edTimSanPham.setText(query == null ? "" : query);
+            edTimSanPham.setSelection(edTimSanPham.length());
+        }
     }
 
     private void xacNhanXoa(SanPham p) {

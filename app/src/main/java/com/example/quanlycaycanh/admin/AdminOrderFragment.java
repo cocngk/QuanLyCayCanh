@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -16,10 +17,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.quanlycaycanh.R;
-import com.example.quanlycaycanh.customer.OrderAdapter;
-import com.example.quanlycaycanh.customer.OrderDetailActivity;
 import com.example.quanlycaycanh.data.DonHang;
 import com.example.quanlycaycanh.data.Repository;
+import com.example.quanlycaycanh.Ui;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 
@@ -30,6 +30,7 @@ public class AdminOrderFragment extends Fragment {
     private OrderAdapter adapter;
     private String trangThai = "TAT_CA";
     private String tuKhoa = "";
+    private TextView tvTongQuan;
 
     @Nullable
     @Override
@@ -41,13 +42,13 @@ public class AdminOrderFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View v, @Nullable Bundle savedInstanceState) {
         repo = new Repository(requireContext());
+        tvTongQuan = v.findViewById(R.id.tvTongQuanHoaDon);
 
         RecyclerView rv = v.findViewById(R.id.rvDonHang);
         rv.setLayoutManager(new LinearLayoutManager(requireContext()));
         adapter = new OrderAdapter(true, don -> {
             Intent i = new Intent(requireContext(), OrderDetailActivity.class);
             i.putExtra(OrderDetailActivity.EXTRA_MA_DON, (long) don.maDonHang);
-            i.putExtra(OrderDetailActivity.EXTRA_ADMIN, true);
             startActivity(i);
         });
         rv.setAdapter(adapter);
@@ -103,5 +104,18 @@ public class AdminOrderFragment extends Fragment {
             return;
         }
         adapter.submit(repo.adminOrders(trangThai, tuKhoa));
+        int completed = 0;
+        int cancelled = 0;
+        for (DonHang order : repo.adminOrders("TAT_CA", "")) {
+            if (DonHang.DA_GIAO.equals(order.trangThai)) {
+                completed++;
+            } else if (DonHang.DA_HUY.equals(order.trangThai)) {
+                cancelled++;
+            }
+        }
+        tvTongQuan.setText("Hóa đơn: " + repo.countOrders()
+                + "  ·  Hoàn thành: " + completed
+                + "  ·  Đã hủy: " + cancelled
+                + "\nDoanh thu đã giao: " + Ui.vnd(repo.totalRevenue()));
     }
 }

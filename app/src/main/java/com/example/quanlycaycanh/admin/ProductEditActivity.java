@@ -2,12 +2,16 @@ package com.example.quanlycaycanh.admin;
 
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.net.Uri;
 import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -32,12 +36,28 @@ public class ProductEditActivity extends AppCompatActivity {
     private List<LoaiCay> loaiCays = new ArrayList<>();
     private Spinner spLoai;
     private TextInputEditText edTen;
-    private TextInputEditText edEmoji;
     private TextInputEditText edGia;
     private TextInputEditText edTon;
     private TextInputEditText edMoTa;
     private TextInputEditText edChamSoc;
     private MaterialSwitch swDangBan;
+    private ImageView imgAnhCay;
+    private TextView tvEmojiFallback;
+    private String hinhAnh = "🪴";
+    private final ActivityResultLauncher<String[]> chonAnh =
+            registerForActivityResult(new ActivityResultContracts.OpenDocument(), uri -> {
+                if (uri == null) {
+                    return;
+                }
+                try {
+                    getContentResolver().takePersistableUriPermission(uri,
+                            android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                } catch (SecurityException ignored) {
+                    // Một số nhà cung cấp ảnh chỉ cấp quyền đọc tạm thời.
+                }
+                hinhAnh = uri.toString();
+                hienAnh();
+            });
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,7 +74,8 @@ public class ProductEditActivity extends AppCompatActivity {
         TextView tvTieuDe = findViewById(R.id.tvTieuDe);
         spLoai = findViewById(R.id.spLoai);
         edTen = findViewById(R.id.edTen);
-        edEmoji = findViewById(R.id.edEmoji);
+        imgAnhCay = findViewById(R.id.imgAnhCay);
+        tvEmojiFallback = findViewById(R.id.tvEmojiFallback);
         edGia = findViewById(R.id.edGia);
         edTon = findViewById(R.id.edTon);
         edMoTa = findViewById(R.id.edMoTa);
@@ -69,6 +90,7 @@ public class ProductEditActivity extends AppCompatActivity {
                 android.R.layout.simple_spinner_item, tenLoai);
         spAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spLoai.setAdapter(spAdapter);
+        findViewById(R.id.btnChonAnh).setOnClickListener(v -> chonAnh.launch(new String[]{"image/*"}));
 
         int maSanPham = getIntent().getIntExtra(EXTRA_MA_SAN_PHAM, 0);
         if (maSanPham > 0) {
@@ -77,7 +99,8 @@ public class ProductEditActivity extends AppCompatActivity {
             findViewById(R.id.btnNgungBan).setVisibility(View.VISIBLE);
             if (sanPham != null) {
                 edTen.setText(sanPham.tenCay);
-                edEmoji.setText(sanPham.hinhAnh);
+                hinhAnh = sanPham.hinhAnh == null ? "🪴" : sanPham.hinhAnh;
+                hienAnh();
                 edGia.setText(String.valueOf((long) sanPham.giaBan));
                 edTon.setText(String.valueOf(sanPham.soLuongTon));
                 edMoTa.setText(sanPham.moTa);
@@ -91,7 +114,8 @@ public class ProductEditActivity extends AppCompatActivity {
                 }
             }
         } else {
-            edEmoji.setText("🪴");
+            hinhAnh = "🪴";
+            hienAnh();
         }
 
         findViewById(R.id.btnLuu).setOnClickListener(v -> luu());
@@ -112,8 +136,7 @@ public class ProductEditActivity extends AppCompatActivity {
         SanPham p = sanPham == null ? new SanPham() : sanPham;
         p.tenCay = ten;
         p.maLoai = loaiCays.get(spLoai.getSelectedItemPosition()).maLoai;
-        String emoji = text(edEmoji);
-        p.hinhAnh = TextUtils.isEmpty(emoji) ? "🪴" : emoji;
+        p.hinhAnh = TextUtils.isEmpty(hinhAnh) ? "🪴" : hinhAnh;
         p.giaBan = gia;
         p.soLuongTon = (int) so(text(edTon));
         p.moTa = text(edMoTa);
@@ -145,6 +168,22 @@ public class ProductEditActivity extends AppCompatActivity {
 
     private static String text(TextInputEditText e) {
         return e.getText() == null ? "" : e.getText().toString().trim();
+    }
+
+    private void hienAnh() {
+        if (hinhAnh != null && (hinhAnh.startsWith("content://") || hinhAnh.startsWith("file://"))) {
+            try {
+                imgAnhCay.setImageURI(Uri.parse(hinhAnh));
+                imgAnhCay.setVisibility(View.VISIBLE);
+                tvEmojiFallback.setVisibility(View.GONE);
+                return;
+            } catch (RuntimeException ignored) {
+                // Fall back to an emoji if a saved media URI is no longer available.
+            }
+        }
+        imgAnhCay.setVisibility(View.GONE);
+        tvEmojiFallback.setVisibility(View.VISIBLE);
+        tvEmojiFallback.setText(TextUtils.isEmpty(hinhAnh) ? "🪴" : hinhAnh);
     }
 
     private static double so(String s) {

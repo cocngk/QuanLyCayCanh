@@ -194,7 +194,9 @@ public class StatsFragment extends Fragment {
             row.addView(thu);
 
             TextView ten = new TextView(requireContext());
-            ten.setText(p.hinhAnh + "  " + p.tenCay);
+            String icon = p.hinhAnh != null && !p.hinhAnh.startsWith("content://")
+                    && !p.hinhAnh.startsWith("file://") ? p.hinhAnh : "🌿";
+            ten.setText(icon + "  " + p.tenCay);
             ten.setTextSize(12);
             ten.setTextColor(requireContext().getColor(R.color.brown_dark));
             LinearLayout.LayoutParams lpTen = new LinearLayout.LayoutParams(0,
@@ -223,7 +225,9 @@ public class StatsFragment extends Fragment {
             row.setPadding(0, Ui.dp(requireContext(), 4), 0, Ui.dp(requireContext(), 4));
 
             TextView ten = new TextView(requireContext());
-            ten.setText(p.hinhAnh + "  " + p.tenCay);
+            String icon = p.hinhAnh != null && !p.hinhAnh.startsWith("content://")
+                    && !p.hinhAnh.startsWith("file://") ? p.hinhAnh : "🌿";
+            ten.setText(icon + "  " + p.tenCay);
             ten.setTextSize(12);
             ten.setTextColor(requireContext().getColor(R.color.brown_dark));
             row.addView(ten, new LinearLayout.LayoutParams(0,

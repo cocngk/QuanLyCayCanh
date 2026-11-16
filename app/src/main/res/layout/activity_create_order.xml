@@ -9,27 +9,28 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@color/brown"
         android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:padding="16dp">
+        android:padding="12dp">
 
         <ImageButton
             android:id="@+id/btnQuayLai"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:background="@drawable/bg_emoji"
+            android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="Quay lại"
             android:padding="9dp"
             android:src="@drawable/ic_back"
-            app:tint="@color/brown" />
+            app:tint="@color/white" />
 
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
             android:layout_weight="1"
-            android:text="Tạo đơn tại quầy"
-            android:textColor="@color/brown_dark"
+            android:text="Tạo hóa đơn"
+            android:textColor="@color/white"
             android:textSize="18sp"
             android:textStyle="bold" />
     </LinearLayout>
@@ -37,25 +38,54 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
+        android:orientation="vertical"
         android:paddingHorizontal="16dp">
 
-        <Spinner
-            android:id="@+id/spKhach"
-            android:layout_width="0dp"
-            android:layout_height="46dp"
-            android:layout_weight="1"
-            android:background="@drawable/bg_search"
-            android:paddingHorizontal="12dp" />
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Tên khách hàng">
 
-        <Spinner
-            android:id="@+id/spThanhToan"
-            android:layout_width="0dp"
-            android:layout_height="46dp"
-            android:layout_marginStart="8dp"
-            android:layout_weight="1"
-            android:background="@drawable/bg_search"
-            android:paddingHorizontal="12dp" />
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/edTenKhach"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textCapWords"
+                android:maxLines="1" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="Số điện thoại">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/edSoDienThoai"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="phone"
+                    android:maxLines="1" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <Spinner
+                android:id="@+id/spThanhToan"
+                android:layout_width="0dp"
+                android:layout_height="52dp"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_search"
+                android:paddingHorizontal="12dp" />
+        </LinearLayout>
     </LinearLayout>
 
     <TextView
@@ -63,15 +93,47 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
         android:paddingHorizontal="16dp"
-        android:text="Chọn số lượng từng sản phẩm"
+        android:text="Thêm cây cảnh vào hóa đơn"
         android:textColor="@color/muted"
         android:textSize="12sp" />
+
+    <EditText
+        android:id="@+id/edTimSanPham"
+        android:layout_width="match_parent"
+        android:layout_height="46dp"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="6dp"
+        android:background="@drawable/bg_search"
+        android:drawableStart="@drawable/ic_search"
+        android:drawablePadding="8dp"
+        android:hint="Tìm kiếm cây cảnh..."
+        android:inputType="text"
+        android:maxLines="1"
+        android:paddingHorizontal="12dp"
+        android:textColor="@color/brown_dark"
+        android:textColorHint="@color/muted"
+        android:textSize="13sp" />
+
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:scrollbars="none">
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/chipLoaiCay"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="12dp"
+            app:chipSpacingHorizontal="6dp"
+            app:singleSelection="true" />
+    </HorizontalScrollView>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvSanPham"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginTop="4dp"
+        android:layout_marginTop="2dp"
         android:layout_weight="1"
         android:clipToPadding="false"
         android:paddingHorizontal="16dp"
@@ -99,7 +161,7 @@
             android:id="@+id/btnTaoDon"
             android:layout_width="wrap_content"
             android:layout_height="50dp"
-            android:text="Tạo đơn"
+            android:text="Lưu hóa đơn"
             android:textAllCaps="false"
             app:cornerRadius="14dp" />
     </LinearLayout>

@@ -5,8 +5,8 @@
     android:layout_height="wrap_content"
     android:layout_marginVertical="5dp"
     app:cardBackgroundColor="@color/paper"
-    app:cardCornerRadius="14dp"
-    app:cardElevation="0dp"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="1dp"
     app:strokeColor="@color/line"
     app:strokeWidth="1dp">
 
@@ -17,19 +17,32 @@
         android:orientation="horizontal"
         android:padding="10dp">
 
-        <TextView
-            android:id="@+id/tvEmoji"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:background="@drawable/bg_emoji"
-            android:gravity="center"
-            android:text="🪴"
-            android:textSize="22sp" />
+        <FrameLayout
+            android:layout_width="72dp"
+            android:layout_height="72dp"
+            android:background="@drawable/bg_emoji">
+
+            <ImageView
+                android:id="@+id/imgPlant"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:contentDescription="Ảnh cây cảnh"
+                android:scaleType="centerCrop"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/tvEmoji"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:text="🪴"
+                android:textSize="28sp" />
+        </FrameLayout>
 
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
+            android:layout_marginStart="12dp"
             android:layout_weight="1"
             android:orientation="vertical">
 
@@ -41,13 +54,14 @@
                 android:maxLines="1"
                 android:text="Sen đá mini"
                 android:textColor="@color/brown_dark"
-                android:textSize="14sp"
+                android:textSize="15sp"
                 android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/tvLoaiGia"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
                 android:text="Cây để bàn · 45.000 ₫"
                 android:textColor="@color/muted"
                 android:textSize="12sp" />
@@ -56,27 +70,28 @@
                 android:id="@+id/tvTon"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="3dp"
                 android:text="Tồn 25 · Đang bán"
                 android:textColor="@color/green"
-                android:textSize="11sp" />
+                android:textSize="12sp" />
         </LinearLayout>
 
         <ImageButton
             android:id="@+id/btnSua"
-            android:layout_width="34dp"
-            android:layout_height="34dp"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="Sửa"
             android:padding="8dp"
             android:src="@drawable/ic_edit"
-            app:tint="@color/brown" />
+            app:tint="@color/green" />
 
         <ImageButton
             android:id="@+id/btnXoa"
-            android:layout_width="34dp"
-            android:layout_height="34dp"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="Xoá"
+            android:contentDescription="Xóa"
             android:padding="8dp"
             android:src="@drawable/ic_delete"
             app:tint="@color/red" />

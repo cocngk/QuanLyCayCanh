@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.drawable.GradientDrawable;
 import android.view.View;
+import android.net.Uri;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -144,6 +146,26 @@ public final class Ui {
             default:
                 return ContextCompat.getColor(c, R.color.cat_outdoor);
         }
+    }
+
+    /** Show either a persisted plant photo URI or the legacy emoji fallback. */
+    public static void hienAnhCay(Context context, String source, ImageView image, TextView fallback,
+                                  int maLoai) {
+        String value = source == null || source.trim().isEmpty() ? "🪴" : source;
+        fallback.setBackground(boTron(context, nenDanhMuc(context, maLoai), 12));
+        if (value.startsWith("content://") || value.startsWith("file://")) {
+            try {
+                image.setImageURI(Uri.parse(value));
+                image.setVisibility(View.VISIBLE);
+                fallback.setVisibility(View.GONE);
+                return;
+            } catch (RuntimeException ignored) {
+                value = "🪴";
+            }
+        }
+        image.setVisibility(View.GONE);
+        fallback.setVisibility(View.VISIBLE);
+        fallback.setText(value);
     }
 
     public static void an(View v) {

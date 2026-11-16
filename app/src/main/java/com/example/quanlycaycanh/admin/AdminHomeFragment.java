@@ -5,26 +5,20 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.quanlycaycanh.LoginActivity;
 import com.example.quanlycaycanh.R;
 import com.example.quanlycaycanh.Ui;
-import com.example.quanlycaycanh.customer.OrderAdapter;
-import com.example.quanlycaycanh.customer.OrderDetailActivity;
-import com.example.quanlycaycanh.data.DonHang;
 import com.example.quanlycaycanh.data.Repository;
 import com.example.quanlycaycanh.data.SanPham;
-import com.example.quanlycaycanh.data.Session;
-import com.example.quanlycaycanh.data.TaiKhoan;
 
 import java.util.List;
 
@@ -32,12 +26,11 @@ import java.util.List;
 public class AdminHomeFragment extends Fragment {
 
     private Repository repo;
-    private Session session;
     private OrderAdapter orderAdapter;
     private TextView tvTongSanPham;
     private TextView tvTongDon;
     private TextView tvDoanhThu;
-    private TextView tvTonThap;
+    private TextView tvTonKho;
     private LinearLayout khungTonThap;
 
     @Nullable
@@ -50,34 +43,30 @@ public class AdminHomeFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View v, @Nullable Bundle savedInstanceState) {
         repo = new Repository(requireContext());
-        session = new Session(requireContext());
         tvTongSanPham = v.findViewById(R.id.tvTongSanPham);
         tvTongDon = v.findViewById(R.id.tvTongDon);
         tvDoanhThu = v.findViewById(R.id.tvDoanhThu);
-        tvTonThap = v.findViewById(R.id.tvTonThap);
+        tvTonKho = v.findViewById(R.id.tvTonKho);
         khungTonThap = v.findViewById(R.id.khungTonThap);
 
-        TaiKhoan tk = repo.user(session.maTaiKhoan());
-        TextView tvChao = v.findViewById(R.id.tvChao);
-        if (tk != null) {
-            String ten = tk.hoTen == null ? "" : tk.hoTen.trim();
-            int space = ten.lastIndexOf(' ');
-            if (space > 0) {
-                ten = ten.substring(space + 1);
+        AdminActivity activity = (AdminActivity) requireActivity();
+        v.findViewById(R.id.btnTaiKhoanNhanh).setOnClickListener(x -> activity.chonTabTaiKhoan());
+        v.findViewById(R.id.btnTaiKhoanNhanhText).setOnClickListener(x -> activity.chonTabTaiKhoan());
+        v.findViewById(R.id.btnQuanLyCayNhanh).setOnClickListener(x ->
+                activity.moTab(R.id.tab_admin_products));
+        v.findViewById(R.id.btnTaoHoaDonNhanh).setOnClickListener(x ->
+                startActivity(new android.content.Intent(requireContext(), CreateOrderActivity.class)));
+        v.findViewById(R.id.btnQuanLyHoaDonNhanh).setOnClickListener(x -> activity.chonTabDonHang());
+        v.findViewById(R.id.btnThongKeNhanh).setOnClickListener(x ->
+                activity.moTab(R.id.tab_stats));
+        android.widget.EditText edTimNhanh = v.findViewById(R.id.edTimNhanh);
+        edTimNhanh.setOnEditorActionListener((textView, actionId, event) -> {
+            if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                activity.moTimSanPham(edTimNhanh.getText().toString().trim());
+                return true;
             }
-            tvChao.setText("Xin chào, " + ten);
-        }
-
-        v.findViewById(R.id.btnDangXuat).setOnClickListener(x -> new AlertDialog.Builder(requireContext())
-                .setMessage("Đăng xuất khỏi tài khoản quản trị?")
-                .setNegativeButton("Ở lại", null)
-                .setPositiveButton("Đăng xuất", (d, w) -> {
-                    session.dangXuat();
-                    startActivity(new Intent(requireContext(), LoginActivity.class)
-                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK));
-                    requireActivity().finish();
-                })
-                .show());
+            return false;
+        });
 
         RecyclerView rv = v.findViewById(R.id.rvDonGanDay);
         rv.setLayoutManager(new LinearLayoutManager(requireContext()));
@@ -85,7 +74,6 @@ public class AdminHomeFragment extends Fragment {
         orderAdapter = new OrderAdapter(true, don -> {
             Intent i = new Intent(requireContext(), OrderDetailActivity.class);
             i.putExtra(OrderDetailActivity.EXTRA_MA_DON, (long) don.maDonHang);
-            i.putExtra(OrderDetailActivity.EXTRA_ADMIN, true);
             startActivity(i);
         });
         rv.setAdapter(orderAdapter);
@@ -102,7 +90,7 @@ public class AdminHomeFragment extends Fragment {
         tvDoanhThu.setText(Ui.vnd(repo.totalRevenue()));
 
         List<SanPham> sapHet = repo.lowStock(Repository.NGUONG_TON_THAP);
-        tvTonThap.setText(String.valueOf(sapHet.size()));
+        tvTonKho.setText(String.valueOf(repo.totalStock()));
         orderAdapter.submit(repo.recentOrders(5));
 
         khungTonThap.removeAllViews();
@@ -116,7 +104,8 @@ public class AdminHomeFragment extends Fragment {
         LayoutInflater inflater = LayoutInflater.from(requireContext());
         for (SanPham p : sapHet) {
             View row = inflater.inflate(R.layout.item_pick_product, khungTonThap, false);
-            ((TextView) row.findViewById(R.id.tvEmoji)).setText(p.hinhAnh);
+            Ui.hienAnhCay(requireContext(), p.hinhAnh,
+                    row.findViewById(R.id.imgPlant), row.findViewById(R.id.tvEmoji), p.maLoai);
             ((TextView) row.findViewById(R.id.tvTen)).setText(p.tenCay);
             ((TextView) row.findViewById(R.id.tvGiaTon)).setText("Chỉ còn " + p.soLuongTon + " cây");
             row.findViewById(R.id.btnGiam).setVisibility(View.GONE);
