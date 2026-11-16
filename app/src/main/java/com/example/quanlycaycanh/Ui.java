@@ -146,24 +146,40 @@ public final class Ui {
         }
     }
 
-    /** Show either a persisted plant photo URI or the legacy emoji fallback. */
-    public static void hienAnhCay(Context context, String source, ImageView image, TextView fallback,
-                                  int maLoai) {
-        String value = source == null || source.trim().isEmpty() ? "🪴" : source;
+    /** Show a bundled photo or a user-selected photo URI without rendering legacy emoji values. */
+    public static boolean hienAnhCay(Context context, String source, ImageView image,
+                                     TextView fallback, int maLoai) {
         fallback.setBackground(boTron(context, nenDanhMuc(context, maLoai), 12));
+        boolean shown = hienAnhCay(context, source, image, maLoai);
+        fallback.setVisibility(shown ? View.GONE : View.VISIBLE);
+        fallback.setText(shown ? "" : "Ảnh cây");
+        fallback.setTextSize(12);
+        return shown;
+    }
+
+    /** Image-only overload for compact rows such as dynamic statistics. */
+    public static boolean hienAnhCay(Context context, String source, ImageView image, int maLoai) {
+        String value = source == null ? "" : source.trim();
+        image.setBackground(boTron(context, nenDanhMuc(context, maLoai), 12));
+        image.setClipToOutline(true);
+        image.setImageDrawable(null);
         if (value.startsWith("content://") || value.startsWith("file://")) {
             try {
                 image.setImageURI(Uri.parse(value));
                 image.setVisibility(View.VISIBLE);
-                fallback.setVisibility(View.GONE);
-                return;
+                return true;
             } catch (RuntimeException ignored) {
-                value = "🪴";
+                // Use the neutral no-photo tile rather than restoring the old emoji.
             }
         }
+        int resource = PlantPhotos.drawableResource(context, value);
+        if (resource != 0) {
+            image.setImageResource(resource);
+            image.setVisibility(View.VISIBLE);
+            return true;
+        }
         image.setVisibility(View.GONE);
-        fallback.setVisibility(View.VISIBLE);
-        fallback.setText(value);
+        return false;
     }
 
     public static void an(View v) {

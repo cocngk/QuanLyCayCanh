@@ -105,7 +105,7 @@ public class AdminHomeFragment extends Fragment {
         for (SanPham p : sapHet) {
             View row = inflater.inflate(R.layout.item_pick_product, khungTonThap, false);
             Ui.hienAnhCay(requireContext(), p.hinhAnh,
-                    row.findViewById(R.id.imgPlant), row.findViewById(R.id.tvEmoji), p.maLoai);
+                    row.findViewById(R.id.imgPlant), row.findViewById(R.id.tvPhotoFallback), p.maLoai);
             ((TextView) row.findViewById(R.id.tvTen)).setText(p.tenCay);
             ((TextView) row.findViewById(R.id.tvGiaTon)).setText("Chỉ còn " + p.soLuongTon + " cây");
             row.findViewById(R.id.btnGiam).setVisibility(View.GONE);

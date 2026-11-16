@@ -2,6 +2,7 @@ package com.example.quanlycaycanh.admin;
 
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.content.Intent;
 import android.net.Uri;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -16,6 +17,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.quanlycaycanh.R;
+import com.example.quanlycaycanh.PlantPhotos;
 import com.example.quanlycaycanh.Ui;
 import com.example.quanlycaycanh.data.LoaiCay;
 import com.example.quanlycaycanh.data.Repository;
@@ -42,8 +44,9 @@ public class ProductEditActivity extends AppCompatActivity {
     private TextInputEditText edChamSoc;
     private MaterialSwitch swDangBan;
     private ImageView imgAnhCay;
-    private TextView tvEmojiFallback;
-    private String hinhAnh = "🪴";
+    private TextView tvPhotoFallback;
+    private TextView tvNguonAnh;
+    private String hinhAnh = "";
     private final ActivityResultLauncher<String[]> chonAnh =
             registerForActivityResult(new ActivityResultContracts.OpenDocument(), uri -> {
                 if (uri == null) {
@@ -75,7 +78,8 @@ public class ProductEditActivity extends AppCompatActivity {
         spLoai = findViewById(R.id.spLoai);
         edTen = findViewById(R.id.edTen);
         imgAnhCay = findViewById(R.id.imgAnhCay);
-        tvEmojiFallback = findViewById(R.id.tvEmojiFallback);
+        tvPhotoFallback = findViewById(R.id.tvPhotoFallback);
+        tvNguonAnh = findViewById(R.id.tvNguonAnh);
         edGia = findViewById(R.id.edGia);
         edTon = findViewById(R.id.edTon);
         edMoTa = findViewById(R.id.edMoTa);
@@ -99,7 +103,7 @@ public class ProductEditActivity extends AppCompatActivity {
             findViewById(R.id.btnNgungBan).setVisibility(View.VISIBLE);
             if (sanPham != null) {
                 edTen.setText(sanPham.tenCay);
-                hinhAnh = sanPham.hinhAnh == null ? "🪴" : sanPham.hinhAnh;
+                hinhAnh = sanPham.hinhAnh == null ? "" : sanPham.hinhAnh;
                 hienAnh();
                 edGia.setText(String.valueOf((long) sanPham.giaBan));
                 edTon.setText(String.valueOf(sanPham.soLuongTon));
@@ -114,7 +118,7 @@ public class ProductEditActivity extends AppCompatActivity {
                 }
             }
         } else {
-            hinhAnh = "🪴";
+            hinhAnh = "";
             hienAnh();
         }
 
@@ -136,7 +140,7 @@ public class ProductEditActivity extends AppCompatActivity {
         SanPham p = sanPham == null ? new SanPham() : sanPham;
         p.tenCay = ten;
         p.maLoai = loaiCays.get(spLoai.getSelectedItemPosition()).maLoai;
-        p.hinhAnh = TextUtils.isEmpty(hinhAnh) ? "🪴" : hinhAnh;
+        p.hinhAnh = TextUtils.isEmpty(hinhAnh) ? null : hinhAnh;
         p.giaBan = gia;
         p.soLuongTon = (int) so(text(edTon));
         p.moTa = text(edMoTa);
@@ -171,19 +175,31 @@ public class ProductEditActivity extends AppCompatActivity {
     }
 
     private void hienAnh() {
-        if (hinhAnh != null && (hinhAnh.startsWith("content://") || hinhAnh.startsWith("file://"))) {
-            try {
-                imgAnhCay.setImageURI(Uri.parse(hinhAnh));
-                imgAnhCay.setVisibility(View.VISIBLE);
-                tvEmojiFallback.setVisibility(View.GONE);
-                return;
-            } catch (RuntimeException ignored) {
-                // Fall back to an emoji if a saved media URI is no longer available.
-            }
+        int maLoai = sanPham == null ? 0 : sanPham.maLoai;
+        boolean coAnh = Ui.hienAnhCay(this, hinhAnh, imgAnhCay, tvPhotoFallback, maLoai);
+        if (!coAnh) {
+            tvPhotoFallback.setText("Chọn ảnh cây cảnh");
+            tvNguonAnh.setVisibility(View.GONE);
+            tvNguonAnh.setOnClickListener(null);
+            return;
         }
-        imgAnhCay.setVisibility(View.GONE);
-        tvEmojiFallback.setVisibility(View.VISIBLE);
-        tvEmojiFallback.setText(TextUtils.isEmpty(hinhAnh) ? "🪴" : hinhAnh);
+
+        PlantPhotos.Credit credit = PlantPhotos.credit(hinhAnh);
+        tvNguonAnh.setVisibility(View.VISIBLE);
+        if (credit == null) {
+            tvNguonAnh.setText("Ảnh do bạn chọn");
+            tvNguonAnh.setOnClickListener(null);
+            return;
+        }
+        tvNguonAnh.setText("Ảnh: " + credit.author + " · " + credit.license
+                + " · Wikimedia Commons (nhấn để xem nguồn và giấy phép)");
+        tvNguonAnh.setOnClickListener(v -> {
+            try {
+                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(credit.sourceUrl)));
+            } catch (RuntimeException ignored) {
+                Ui.toast(this, "Không mở được trang nguồn ảnh");
+            }
+        });
     }
 
     private static double so(String s) {

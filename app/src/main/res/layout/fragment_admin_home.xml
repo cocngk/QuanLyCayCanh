@@ -83,12 +83,12 @@
                     android:textSize="12sp" />
             </LinearLayout>
 
-            <TextView
+            <ImageView
                 android:layout_width="92dp"
                 android:layout_height="match_parent"
-                android:gravity="center"
-                android:text="🪴"
-                android:textSize="58sp" />
+                android:contentDescription="Cây bàng Singapore"
+                android:scaleType="centerCrop"
+                android:src="@drawable/plant_bang_singapore" />
         </LinearLayout>
 
         <EditText
@@ -247,7 +247,7 @@
                 android:layout_width="0dp"
                 android:layout_height="72dp"
                 android:layout_weight="1"
-                android:text="🌿\nQuản lý cây"
+                android:text="Quản lý cây"
                 android:textAllCaps="false"
                 android:textColor="@color/brown_dark"
                 app:cornerRadius="16dp" />

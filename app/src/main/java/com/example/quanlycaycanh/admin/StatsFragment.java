@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -193,10 +194,9 @@ public class StatsFragment extends Fragment {
             thu.setWidth(Ui.dp(requireContext(), 22));
             row.addView(thu);
 
+            row.addView(anhCayNho(p));
             TextView ten = new TextView(requireContext());
-            String icon = p.hinhAnh != null && !p.hinhAnh.startsWith("content://")
-                    && !p.hinhAnh.startsWith("file://") ? p.hinhAnh : "🌿";
-            ten.setText(icon + "  " + p.tenCay);
+            ten.setText(p.tenCay);
             ten.setTextSize(12);
             ten.setTextColor(requireContext().getColor(R.color.brown_dark));
             LinearLayout.LayoutParams lpTen = new LinearLayout.LayoutParams(0,
@@ -224,10 +224,9 @@ public class StatsFragment extends Fragment {
             row.setOrientation(LinearLayout.HORIZONTAL);
             row.setPadding(0, Ui.dp(requireContext(), 4), 0, Ui.dp(requireContext(), 4));
 
+            row.addView(anhCayNho(p));
             TextView ten = new TextView(requireContext());
-            String icon = p.hinhAnh != null && !p.hinhAnh.startsWith("content://")
-                    && !p.hinhAnh.startsWith("file://") ? p.hinhAnh : "🌿";
-            ten.setText(icon + "  " + p.tenCay);
+            ten.setText(p.tenCay);
             ten.setTextSize(12);
             ten.setTextColor(requireContext().getColor(R.color.brown_dark));
             row.addView(ten, new LinearLayout.LayoutParams(0,
@@ -241,6 +240,17 @@ public class StatsFragment extends Fragment {
 
             khungTonThap.addView(row);
         }
+    }
+
+    private ImageView anhCayNho(SanPham p) {
+        ImageView image = new ImageView(requireContext());
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                Ui.dp(requireContext(), 32), Ui.dp(requireContext(), 32));
+        params.setMarginEnd(Ui.dp(requireContext(), 8));
+        image.setLayoutParams(params);
+        image.setContentDescription(p.tenCay);
+        Ui.hienAnhCay(requireContext(), p.hinhAnh, image, p.maLoai);
+        return image;
     }
 
     private TextView dongChu(String s) {

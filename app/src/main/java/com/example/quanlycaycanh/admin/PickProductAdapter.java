@@ -76,7 +76,7 @@ public class PickProductAdapter extends RecyclerView.Adapter<PickProductAdapter.
     public void onBindViewHolder(@NonNull VH h, int position) {
         SanPham p = items.get(position);
         int sl = soLuong.get(p.maSanPham, 0);
-        Ui.hienAnhCay(h.itemView.getContext(), p.hinhAnh, h.imgPlant, h.tvEmoji, p.maLoai);
+        Ui.hienAnhCay(h.itemView.getContext(), p.hinhAnh, h.imgPlant, h.tvPhotoFallback, p.maLoai);
         h.tvTen.setText(p.tenCay);
         h.tvGiaTon.setText(Ui.vnd(p.giaBan) + " · còn " + p.soLuongTon);
         h.tvSoLuong.setText(String.valueOf(sl));
@@ -110,7 +110,7 @@ public class PickProductAdapter extends RecyclerView.Adapter<PickProductAdapter.
     }
 
     static class VH extends RecyclerView.ViewHolder {
-        final TextView tvEmoji;
+        final TextView tvPhotoFallback;
         final ImageView imgPlant;
         final TextView tvTen;
         final TextView tvGiaTon;
@@ -120,7 +120,7 @@ public class PickProductAdapter extends RecyclerView.Adapter<PickProductAdapter.
 
         VH(@NonNull View v) {
             super(v);
-            tvEmoji = v.findViewById(R.id.tvEmoji);
+            tvPhotoFallback = v.findViewById(R.id.tvPhotoFallback);
             imgPlant = v.findViewById(R.id.imgPlant);
             tvTen = v.findViewById(R.id.tvTen);
             tvGiaTon = v.findViewById(R.id.tvGiaTon);

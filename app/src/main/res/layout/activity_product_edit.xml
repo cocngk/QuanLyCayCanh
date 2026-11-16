@@ -89,16 +89,17 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:contentDescription="Ảnh cây cảnh"
-                    android:scaleType="centerCrop"
+                    android:scaleType="fitCenter"
                     android:visibility="gone" />
 
                 <TextView
-                    android:id="@+id/tvEmojiFallback"
+                    android:id="@+id/tvPhotoFallback"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:gravity="center"
-                    android:text="🪴"
-                    android:textSize="70sp" />
+                    android:text="Chọn ảnh cây cảnh"
+                    android:textColor="@color/muted"
+                    android:textSize="14sp" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnChonAnh"
@@ -111,6 +112,18 @@
                     android:textAllCaps="false"
                     app:cornerRadius="14dp" />
             </FrameLayout>
+
+            <TextView
+                android:id="@+id/tvNguonAnh"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="-8dp"
+                android:layout_marginBottom="8dp"
+                android:ellipsize="end"
+                android:maxLines="2"
+                android:textColor="@color/muted"
+                android:textSize="10sp"
+                android:visibility="gone" />
 
             <LinearLayout
                 android:layout_width="match_parent"

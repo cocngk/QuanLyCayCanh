@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -105,13 +106,12 @@ public class OrderDetailActivity extends AppCompatActivity {
         LayoutInflater inflater = LayoutInflater.from(this);
         for (ChiTietDonHang l : repo.orderLines(maDon)) {
             View row = inflater.inflate(R.layout.item_order_line, khungSanPham, false);
-            TextView emoji = row.findViewById(R.id.tvEmoji);
+            ImageView image = row.findViewById(R.id.imgPlant);
             TextView ten = row.findViewById(R.id.tvTen);
             TextView dongGia = row.findViewById(R.id.tvDongGia);
             TextView thanhTien = row.findViewById(R.id.tvThanhTien);
-            String icon = l.hinhAnh != null && !l.hinhAnh.startsWith("content://")
-                    && !l.hinhAnh.startsWith("file://") ? l.hinhAnh : "🌿";
-            emoji.setText(icon);
+            image.setContentDescription(l.tenCay);
+            Ui.hienAnhCay(this, l.hinhAnh, image, 2);
             ten.setText(l.tenCay);
             dongGia.setText(Ui.vnd(l.donGia) + " × " + l.soLuong);
             thanhTien.setText(Ui.vnd(l.thanhTien));

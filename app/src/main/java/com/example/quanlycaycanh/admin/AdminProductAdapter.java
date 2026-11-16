@@ -51,7 +51,7 @@ public class AdminProductAdapter extends RecyclerView.Adapter<AdminProductAdapte
     @Override
     public void onBindViewHolder(@NonNull VH h, int position) {
         SanPham p = items.get(position);
-        Ui.hienAnhCay(h.itemView.getContext(), p.hinhAnh, h.imgPlant, h.tvEmoji, p.maLoai);
+        Ui.hienAnhCay(h.itemView.getContext(), p.hinhAnh, h.imgPlant, h.tvPhotoFallback, p.maLoai);
         h.tvTen.setText(p.tenCay);
         h.tvLoaiGia.setText(p.tenLoai + " · " + Ui.vnd(p.giaBan));
         String trangThai = p.dangBan ? "Đang bán" : "Ngừng bán";
@@ -69,7 +69,7 @@ public class AdminProductAdapter extends RecyclerView.Adapter<AdminProductAdapte
     }
 
     static class VH extends RecyclerView.ViewHolder {
-        final TextView tvEmoji;
+        final TextView tvPhotoFallback;
         final ImageView imgPlant;
         final TextView tvTen;
         final TextView tvLoaiGia;
@@ -79,7 +79,7 @@ public class AdminProductAdapter extends RecyclerView.Adapter<AdminProductAdapte
 
         VH(@NonNull View v) {
             super(v);
-            tvEmoji = v.findViewById(R.id.tvEmoji);
+            tvPhotoFallback = v.findViewById(R.id.tvPhotoFallback);
             imgPlant = v.findViewById(R.id.imgPlant);
             tvTen = v.findViewById(R.id.tvTen);
             tvLoaiGia = v.findViewById(R.id.tvLoaiGia);

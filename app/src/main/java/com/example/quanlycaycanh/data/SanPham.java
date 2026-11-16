@@ -5,7 +5,7 @@ public class SanPham {
     public int maSanPham;
     public String tenCay;
     public int maLoai;
-    public String hinhAnh;          // biểu tượng minh hoạ (emoji) của cây
+    public String hinhAnh;          // khóa ảnh đóng gói hoặc URI ảnh do người dùng chọn
     public double giaBan;
     public int soLuongTon;
     public int soLuongDaBan;   // join: số lượng đã bán (thống kê)

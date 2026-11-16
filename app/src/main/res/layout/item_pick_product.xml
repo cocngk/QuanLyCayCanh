@@ -31,12 +31,12 @@
                 android:visibility="gone" />
 
             <TextView
-                android:id="@+id/tvEmoji"
+                android:id="@+id/tvPhotoFallback"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:gravity="center"
-                android:text="🪴"
-                android:textSize="26sp" />
+                android:text="Ảnh cây"
+                android:textSize="12sp" />
         </FrameLayout>
 
         <LinearLayout
