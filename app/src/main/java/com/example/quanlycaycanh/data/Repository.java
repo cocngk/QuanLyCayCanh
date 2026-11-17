@@ -307,10 +307,6 @@ public class Repository {
     }
 
     public List<ChiTietDonHang> orderLines(long maDonHang) {
-        return lines(maDonHang);
-    }
-
-    private List<ChiTietDonHang> lines(long maDonHang) {
         List<ChiTietDonHang> list = new ArrayList<>();
         Cursor c = db().rawQuery("SELECT ct.*, s.TenCay, s.HinhAnh, s.SoLuongTon "
                 + "FROM ChiTietDonHang ct JOIN SanPham s ON s.MaSanPham = ct.MaSanPham "
