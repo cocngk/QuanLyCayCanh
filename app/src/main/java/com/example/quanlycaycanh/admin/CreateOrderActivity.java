@@ -36,7 +36,6 @@ public class CreateOrderActivity extends AppCompatActivity {
     private Spinner spThanhToan;
     private TextInputEditText edTenKhach;
     private TextInputEditText edSoDienThoai;
-    private final List<SanPham> allProducts = new ArrayList<>();
     private String tuKhoa = "";
     private int maLoai = 0;
 
@@ -61,10 +60,10 @@ public class CreateOrderActivity extends AppCompatActivity {
         spThanhToanAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spThanhToan.setAdapter(spThanhToanAdapter);
 
-        allProducts.clear();
+        List<SanPham> products = new ArrayList<>();
         for (SanPham p : repo.adminProducts("", 0, "dang_ban")) {
             if (p.soLuongTon > 0) {
-                allProducts.add(p);
+                products.add(p);
             }
         }
 
@@ -72,7 +71,7 @@ public class CreateOrderActivity extends AppCompatActivity {
         rv.setLayoutManager(new LinearLayoutManager(this));
         adapter = new PickProductAdapter(() -> tvTongTien.setText(Ui.vnd(tongTienHienTai())));
         rv.setAdapter(adapter);
-        adapter.submit(allProducts);
+        adapter.submit(products);
 
         ChipGroup categories = findViewById(R.id.chipLoaiCay);
         themChip(categories, "Tất cả", 0);
@@ -164,7 +163,7 @@ public class CreateOrderActivity extends AppCompatActivity {
             return;
         }
         List<SanPham> filtered = new ArrayList<>();
-        for (SanPham product : allProducts) {
+        for (SanPham product : adapter.danhSach()) {
             boolean matchName = product.tenCay != null
                     && product.tenCay.toLowerCase(java.util.Locale.ROOT).contains(tuKhoa);
             boolean matchCategory = maLoai == 0 || product.maLoai == maLoai;
