@@ -59,7 +59,6 @@ public class AdminAccountFragment extends Fragment {
         view.findViewById(R.id.btnGioiThieu).setOnClickListener(v ->
                 startActivity(new Intent(requireContext(), AboutActivity.class)));
         view.findViewById(R.id.btnAdminDangXuat).setOnClickListener(v -> xacNhanDangXuat());
-        napThongTin(view);
     }
 
     @Override
