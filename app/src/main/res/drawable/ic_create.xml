@@ -1,0 +1,24 @@
+<!--
+  ~ Copyright (C) 2026 The Android Open Source Project
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~      http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android" android:height="24dp" android:viewportHeight="1024" android:viewportWidth="1024" android:width="24dp">
+      
+    <path android:fillColor="#2E7D32" android:pathData="M731.2,584.3c-101,0 -182.9,81.9 -182.9,182.9 0,101 81.9,182.9 182.9,182.9 101,0 182.9,-81.9 182.9,-182.9 0,-101 -81.9,-182.9 -182.9,-182.9zM731.2,876.9c-60.5,0 -109.7,-49.2 -109.7,-109.7 0,-60.5 49.2,-109.7 109.7,-109.7 60.5,0 109.7,49.2 109.7,109.7 0,60.5 -49.2,109.7 -109.7,109.7z" android:strokeColor="#2E7D32" android:strokeWidth="1"/>
+      
+    <path android:fillColor="#2E7D32" android:pathData="M752.9,694h-43.9v51.2h-51.2v43.9h51.2v51.2h43.9v-51.2h51.2v-43.9h-51.2zM219.6,475h219.4v73.1H219.6z" android:strokeColor="#2E7D32" android:strokeWidth="1"/>
+      
+    <path android:fillColor="#2E7D32" android:pathData="M182.7,365.9L768.3,365.9v179.5h73.1L841.4,145.2c0,-40 -32.5,-72.5 -72.5,-72.5h-27.3c-29.2,0 -55,16.7 -65.9,42.6 -5.7,13.6 -27.9,13.6 -33.5,0 -10.8,-25.9 -36.7,-42.6 -65.9,-42.6h-18.2c-29.2,0 -55,16.7 -65.9,42.6 -5.7,13.6 -27.9,13.6 -33.5,0 -10.8,-25.9 -36.7,-42.6 -65.9,-42.6h-17.4c-29.2,0 -55,16.7 -65.9,42.6 -5.7,13.6 -27.9,13.6 -33.5,0 -10.8,-25.9 -36.7,-42.6 -65.9,-42.6h-27.6c-40,0 -72.5,32.5 -72.5,72.5v805.1h401.2v-73.1h-328.1l-0.4,-511.4zM208.5,143.6c14.3,34 47.4,56 84.3,56 36.9,0 70,-22 82.7,-53.8l15.8,-2.3c14.3,34 47.4,56 84.3,56 36.9,0 70,-22 82.7,-53.8l16.6,-2.3c14.3,34 47.4,56 84.3,56 36.9,0 70,-22 82.7,-53.8l26.7,-0.7L768.3,292.7L182.6,292.7l-0.1,-146.8 26,-2.2z" android:strokeColor="#2E7D32" android:strokeWidth="1"/>
+    
+</vector>

@@ -1,26 +1,77 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
+
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <application
+
         android:allowBackup="true"
+
         android:dataExtractionRules="@xml/data_extraction_rules"
+
         android:fullBackupContent="@xml/backup_rules"
+
         android:icon="@mipmap/ic_launcher"
+
         android:label="@string/app_name"
+
         android:roundIcon="@mipmap/ic_launcher_round"
+
         android:supportsRtl="true"
-        android:theme="@style/Theme.QuanLyCayCanh">
+
+        android:theme="@style/Theme.Btl">
+
+        <!-- GIỚI THIỆU -->
+        <activity
+            android:name=".About"
+            android:exported="false" />
+
+        <!-- THÔNG BÁO -->
+        <activity
+            android:name=".Notification"
+            android:exported="false" />
+
+        <!-- ĐỔI MẬT KHẨU -->
+        <activity
+            android:name=".ChangePassword"
+            android:exported="false" />
+
+        <!-- THÔNG TIN CÁ NHÂN -->
+        <activity
+            android:name=".Profile"
+            android:exported="false" />
+
+        <!-- QUẢN LÝ TÀI KHOẢN -->
+        <activity
+            android:name=".Account"
+            android:exported="false" />
+
+        <!-- ĐĂNG KÝ -->
+        <activity
+            android:name=".Register"
+            android:exported="false" />
+
+        <!-- TRANG CHỦ -->
         <activity
             android:name=".MainActivity"
-            android:exported="true"
-            android:windowSoftInputMode="adjustResize">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+            android:exported="false" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
+        <!-- ĐĂNG NHẬP: MÀN HÌNH KHỞI ĐỘNG -->
+        <activity
+            android:name=".Login"
+            android:exported="true">
+
+            <intent-filter>
+
+                <action
+                    android:name="android.intent.action.MAIN" />
+
+                <category
+                    android:name="android.intent.category.LAUNCHER" />
+
             </intent-filter>
+
         </activity>
+
     </application>
 
 </manifest>
