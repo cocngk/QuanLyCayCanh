@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteConstraintException;
 import android.database.sqlite.SQLiteException;
 
 import java.text.ParseException;
@@ -48,8 +49,10 @@ public class Repository {
     // ======================================================== Tài khoản quản trị
 
     public TaiKhoan login(String taiKhoan, String matKhau) {
-        Cursor c = db().rawQuery("SELECT * FROM TaiKhoan WHERE (Email = ? OR SoDienThoai = ?) "
-                + "AND MatKhau = ? LIMIT 1", new String[]{taiKhoan, taiKhoan, matKhau});
+        Cursor c = db().rawQuery("SELECT * FROM TaiKhoan WHERE "
+                + "(lower(TenDangNhap) = lower(?) OR lower(Email) = lower(?) OR SoDienThoai = ?) "
+                + "AND MatKhau = ? LIMIT 1",
+                new String[]{taiKhoan, taiKhoan, taiKhoan, matKhau});
         try {
             return c.moveToFirst() ? readUser(c) : null;
         } finally {
@@ -75,10 +78,81 @@ public class Repository {
         return rows > 0;
     }
 
+    public long registerAdmin(String hoTen, String tenDangNhap, String email, String soDienThoai,
+                              String matKhau) {
+        SQLiteDatabase database = db();
+        database.beginTransaction();
+        try {
+            if (accountDetailsTaken(database, tenDangNhap, email, soDienThoai, -1)) {
+                return -1;
+            }
+            ContentValues values = new ContentValues();
+            values.put("HoTen", hoTen);
+            values.put("TenDangNhap", tenDangNhap);
+            values.put("Email", email);
+            values.put("SoDienThoai", soDienThoai);
+            values.put("MatKhau", matKhau);
+            long id = database.insertOrThrow(DBHelper.T_TAIKHOAN, null, values);
+            database.setTransactionSuccessful();
+            return id;
+        } catch (SQLiteConstraintException exception) {
+            return -1;
+        } finally {
+            database.endTransaction();
+        }
+    }
+
+    public boolean updateAccount(int maTaiKhoan, String hoTen, String tenDangNhap,
+                                 String email, String soDienThoai) {
+        SQLiteDatabase database = db();
+        database.beginTransaction();
+        try {
+            if (accountDetailsTaken(database, tenDangNhap, email, soDienThoai, maTaiKhoan)) {
+                return false;
+            }
+            ContentValues values = new ContentValues();
+            values.put("HoTen", hoTen);
+            values.put("TenDangNhap", tenDangNhap);
+            values.put("Email", email);
+            values.put("SoDienThoai", soDienThoai);
+            int rows = database.update(DBHelper.T_TAIKHOAN, values, "MaTaiKhoan = ?",
+                    new String[]{String.valueOf(maTaiKhoan)});
+            if (rows > 0) {
+                database.setTransactionSuccessful();
+                return true;
+            }
+            return false;
+        } catch (SQLiteConstraintException exception) {
+            return false;
+        } finally {
+            database.endTransaction();
+        }
+    }
+
+    private boolean accountDetailsTaken(SQLiteDatabase database, String username, String email,
+                                        String phone, int exceptId) {
+        String sql = "SELECT 1 FROM " + DBHelper.T_TAIKHOAN
+                + " WHERE (lower(TenDangNhap) = lower(?) OR lower(Email) = lower(?) "
+                + "OR SoDienThoai = ?)";
+        List<String> args = new ArrayList<>();
+        args.add(username);
+        args.add(email);
+        args.add(phone);
+        if (exceptId > 0) {
+            sql += " AND MaTaiKhoan <> ?";
+            args.add(String.valueOf(exceptId));
+        }
+        sql += " LIMIT 1";
+        try (Cursor c = database.rawQuery(sql, args.toArray(new String[0]))) {
+            return c.moveToFirst();
+        }
+    }
+
     private TaiKhoan readUser(Cursor c) {
         TaiKhoan t = new TaiKhoan();
         t.maTaiKhoan = c.getInt(c.getColumnIndexOrThrow("MaTaiKhoan"));
         t.hoTen = c.getString(c.getColumnIndexOrThrow("HoTen"));
+        t.tenDangNhap = c.getString(c.getColumnIndexOrThrow("TenDangNhap"));
         t.email = c.getString(c.getColumnIndexOrThrow("Email"));
         t.matKhau = c.getString(c.getColumnIndexOrThrow("MatKhau"));
         t.soDienThoai = c.getString(c.getColumnIndexOrThrow("SoDienThoai"));

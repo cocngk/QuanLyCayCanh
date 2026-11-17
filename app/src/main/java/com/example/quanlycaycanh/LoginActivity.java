@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.widget.CheckBox;
+import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.quanlycaycanh.admin.AdminActivity;
@@ -34,6 +35,7 @@ public class LoginActivity extends AppCompatActivity {
         edMatKhau = findViewById(R.id.edMatKhau);
         cbGhiNho = findViewById(R.id.cbGhiNho);
         MaterialButton btnDangNhap = findViewById(R.id.btnDangNhap);
+        TextView tvDangKy = findViewById(R.id.tvDangKy);
 
         if (session.daDangNhap() && session.ghiNho()) {
             TaiKhoan tk = repo.user(session.maTaiKhoan());
@@ -45,6 +47,8 @@ public class LoginActivity extends AppCompatActivity {
         }
 
         btnDangNhap.setOnClickListener(v -> dangNhap());
+        tvDangKy.setOnClickListener(v ->
+                startActivity(new Intent(this, RegisterActivity.class)));
     }
 
     private void dangNhap() {

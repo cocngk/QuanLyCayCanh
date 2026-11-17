@@ -4,6 +4,7 @@ package com.example.quanlycaycanh.data;
 public class TaiKhoan {
     public int maTaiKhoan;
     public String hoTen;
+    public String tenDangNhap;
     public String email;
     public String matKhau;
     public String soDienThoai;

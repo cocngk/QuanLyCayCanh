@@ -13,7 +13,7 @@ import com.example.quanlycaycanh.PlantPhotos;
 public class DBHelper extends SQLiteOpenHelper {
 
     public static final String DB_NAME = "quanlycaycanh.db";
-    public static final int DB_VERSION = 3;
+    public static final int DB_VERSION = 4;
 
     public static final String T_TAIKHOAN = "TaiKhoan";
     public static final String T_LOAICAY = "LoaiCay";
@@ -39,6 +39,7 @@ public class DBHelper extends SQLiteOpenHelper {
         createCatalogTables(db);
         createInvoiceTables(db, T_DONHANG, T_CHITIET, T_TAIKHOAN);
         seed(db);
+        createUsernameIndex(db);
     }
 
     @Override
@@ -49,12 +50,16 @@ public class DBHelper extends SQLiteOpenHelper {
         if (oldVersion < 3) {
             upgradePlantPhotoKeys(db);
         }
+        if (oldVersion < 4) {
+            upgradeAccountUsernames(db);
+        }
     }
 
     private static void createAccountTable(SQLiteDatabase db, String table) {
         db.execSQL("CREATE TABLE " + table + " ("
                 + "MaTaiKhoan INTEGER PRIMARY KEY AUTOINCREMENT,"
                 + "HoTen TEXT NOT NULL,"
+                + "TenDangNhap TEXT,"
                 + "Email TEXT UNIQUE,"
                 + "MatKhau TEXT NOT NULL,"
                 + "SoDienThoai TEXT)");
@@ -148,7 +153,7 @@ public class DBHelper extends SQLiteOpenHelper {
     }
 
     private static void seed(SQLiteDatabase db) {
-        insertUser(db, "Ngô Đức Duy", "admin@caycanh.vn", "123456", "0901234567");
+        insertUser(db, "Ngô Đức Duy", "admin", "admin@caycanh.vn", "123456", "0901234567");
 
         insertCategory(db, 1, "Cây để bàn", "Cây nhỏ đặt bàn làm việc, ban công, cửa sổ.");
         insertCategory(db, 2, "Cây nội thất", "Cây trong nhà, thanh lọc không khí, ít nắng.");
@@ -215,9 +220,40 @@ public class DBHelper extends SQLiteOpenHelper {
         }
     }
 
-    private static void insertUser(SQLiteDatabase db, String ten, String email, String pass, String sdt) {
+    private static void upgradeAccountUsernames(SQLiteDatabase db) {
+        if (!hasColumn(db, T_TAIKHOAN, "TenDangNhap")) {
+            db.execSQL("ALTER TABLE " + T_TAIKHOAN + " ADD COLUMN TenDangNhap TEXT");
+        }
+        db.execSQL("UPDATE " + T_TAIKHOAN + " SET TenDangNhap = 'admin' "
+                + "WHERE MaTaiKhoan = (SELECT MIN(MaTaiKhoan) FROM " + T_TAIKHOAN + ") "
+                + "AND (TenDangNhap IS NULL OR TRIM(TenDangNhap) = '')");
+        db.execSQL("UPDATE " + T_TAIKHOAN + " SET TenDangNhap = 'admin_' || MaTaiKhoan "
+                + "WHERE TenDangNhap IS NULL OR TRIM(TenDangNhap) = ''");
+        createUsernameIndex(db);
+    }
+
+    private static boolean hasColumn(SQLiteDatabase db, String table, String column) {
+        try (android.database.Cursor c = db.rawQuery("PRAGMA table_info(" + table + ")", null)) {
+            int nameIndex = c.getColumnIndexOrThrow("name");
+            while (c.moveToNext()) {
+                if (column.equalsIgnoreCase(c.getString(nameIndex))) {
+                    return true;
+                }
+            }
+            return false;
+        }
+    }
+
+    private static void createUsernameIndex(SQLiteDatabase db) {
+        db.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS idx_TaiKhoan_TenDangNhap "
+                + "ON " + T_TAIKHOAN + "(TenDangNhap)");
+    }
+
+    private static void insertUser(SQLiteDatabase db, String ten, String username, String email,
+                                   String pass, String sdt) {
         ContentValues v = new ContentValues();
         v.put("HoTen", ten);
+        v.put("TenDangNhap", username);
         v.put("Email", email);
         v.put("MatKhau", pass);
         v.put("SoDienThoai", sdt);

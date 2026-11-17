@@ -21,7 +21,11 @@
             </intent-filter>
         </activity>
 
+        <activity android:name=".RegisterActivity" android:windowSoftInputMode="adjustResize" />
         <activity android:name=".admin.AdminActivity" />
+        <activity android:name=".admin.AccountInfoActivity" android:windowSoftInputMode="adjustResize" />
+        <activity android:name=".admin.ChangePasswordActivity" android:windowSoftInputMode="adjustResize" />
+        <activity android:name=".admin.AboutActivity" />
         <activity android:name=".admin.OrderDetailActivity" />
         <activity android:name=".admin.ProductEditActivity" android:windowSoftInputMode="adjustResize" />
         <activity android:name=".admin.CreateOrderActivity" android:windowSoftInputMode="adjustResize" />

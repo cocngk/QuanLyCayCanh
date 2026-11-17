@@ -1,13 +1,12 @@
 package com.example.quanlycaycanh.admin;
 
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.os.Bundle;
-import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
-import android.widget.LinearLayout;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -17,13 +16,11 @@ import androidx.fragment.app.Fragment;
 
 import com.example.quanlycaycanh.LoginActivity;
 import com.example.quanlycaycanh.R;
-import com.example.quanlycaycanh.Ui;
 import com.example.quanlycaycanh.data.Repository;
 import com.example.quanlycaycanh.data.Session;
 import com.example.quanlycaycanh.data.TaiKhoan;
-import com.google.android.material.textfield.TextInputLayout;
 
-/** Hồ sơ quản trị viên, đổi mật khẩu và đăng xuất. */
+/** Hồ sơ quản trị viên, thông tin cá nhân, đổi mật khẩu và đăng xuất. */
 public class AdminAccountFragment extends Fragment {
 
     private Repository repo;
@@ -40,9 +37,50 @@ public class AdminAccountFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         repo = new Repository(requireContext());
         session = new Session(requireContext());
-        napThongTin(view);
-        view.findViewById(R.id.btnDoiMatKhau).setOnClickListener(v -> hienDialogDoiMatKhau());
+
+        configureAction(view, R.id.btnThongTinCaNhan, "Thông tin cá nhân",
+                "Xem và cập nhật thông tin cá nhân", R.drawable.ic_person);
+        configureAction(view, R.id.btnDoiMatKhau, "Đổi mật khẩu",
+                "Thay đổi mật khẩu đăng nhập", R.drawable.ic_lock);
+        configureAction(view, R.id.btnThongBao, "Thông báo",
+                "Cài đặt và xem thông báo hệ thống", R.drawable.ic_notifications);
+        configureAction(view, R.id.btnGioiThieu, "Giới thiệu ứng dụng",
+                "Thông tin và chức năng của ứng dụng", R.drawable.ic_info);
+
+        view.findViewById(R.id.btnThongTinCaNhan).setOnClickListener(v ->
+                startActivity(new Intent(requireContext(), AccountInfoActivity.class)));
+        view.findViewById(R.id.btnDoiMatKhau).setOnClickListener(v ->
+                startActivity(new Intent(requireContext(), ChangePasswordActivity.class)));
+        view.findViewById(R.id.btnThongBao).setOnClickListener(v ->
+                new AlertDialog.Builder(requireContext())
+                        .setTitle("Thông báo")
+                        .setMessage("Hiện chưa có thông báo mới.")
+                        .setPositiveButton("Đóng", null)
+                        .show());
+        view.findViewById(R.id.btnGioiThieu).setOnClickListener(v ->
+                startActivity(new Intent(requireContext(), AboutActivity.class)));
         view.findViewById(R.id.btnAdminDangXuat).setOnClickListener(v -> xacNhanDangXuat());
+        napThongTin(view);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (getView() != null && repo != null) {
+            napThongTin(getView());
+        }
+    }
+
+    private void configureAction(View parent, int cardId, String title, String subtitle,
+                                 int iconRes) {
+        View card = parent.findViewById(cardId);
+        View content = ((ViewGroup) card).getChildAt(0);
+        ImageView icon = content.findViewById(R.id.imgAction);
+        icon.setImageResource(iconRes);
+        icon.setImageTintList(ColorStateList.valueOf(
+                requireContext().getColor(R.color.green)));
+        ((TextView) content.findViewById(R.id.tvActionTitle)).setText(title);
+        ((TextView) content.findViewById(R.id.tvActionSubtitle)).setText(subtitle);
     }
 
     private void napThongTin(View view) {
@@ -51,57 +89,8 @@ public class AdminAccountFragment extends Fragment {
             return;
         }
         ((TextView) view.findViewById(R.id.tvAdminName)).setText(admin.hoTen);
-        ((TextView) view.findViewById(R.id.tvAdminEmail)).setText(giaTri(admin.email));
-        ((TextView) view.findViewById(R.id.tvAdminPhone)).setText(giaTri(admin.soDienThoai));
-    }
-
-    private void hienDialogDoiMatKhau() {
-        LinearLayout fields = new LinearLayout(requireContext());
-        fields.setOrientation(LinearLayout.VERTICAL);
-        fields.setPadding(Ui.dp(requireContext(), 24), Ui.dp(requireContext(), 8),
-                Ui.dp(requireContext(), 24), 0);
-        EditText oldPassword = themTruong(fields, "Mật khẩu hiện tại");
-        EditText newPassword = themTruong(fields, "Mật khẩu mới");
-        EditText confirmPassword = themTruong(fields, "Nhập lại mật khẩu mới");
-
-        AlertDialog dialog = new AlertDialog.Builder(requireContext())
-                .setTitle("Đổi mật khẩu")
-                .setView(fields)
-                .setNegativeButton("Hủy", null)
-                .setPositiveButton("Cập nhật", null)
-                .create();
-        dialog.setOnShowListener(ignored -> dialog.getButton(AlertDialog.BUTTON_POSITIVE)
-                .setOnClickListener(button -> {
-                    String oldValue = oldPassword.getText().toString();
-                    String newValue = newPassword.getText().toString();
-                    String confirmValue = confirmPassword.getText().toString();
-                    if (newValue.length() < 6) {
-                        Ui.toast(requireContext(), "Mật khẩu mới cần ít nhất 6 ký tự");
-                    } else if (!newValue.equals(confirmValue)) {
-                        Ui.toast(requireContext(), "Mật khẩu nhập lại chưa khớp");
-                    } else if (!repo.changePassword(session.maTaiKhoan(), oldValue, newValue)) {
-                        Ui.toast(requireContext(), "Mật khẩu hiện tại không đúng");
-                    } else {
-                        Ui.toast(requireContext(), "Đã cập nhật mật khẩu");
-                        dialog.dismiss();
-                    }
-                }));
-        dialog.show();
-    }
-
-    private EditText themTruong(LinearLayout parent, String hint) {
-        TextInputLayout input = new TextInputLayout(requireContext());
-        input.setHint(hint);
-        input.setEndIconMode(TextInputLayout.END_ICON_PASSWORD_TOGGLE);
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        params.bottomMargin = Ui.dp(requireContext(), 8);
-        input.setLayoutParams(params);
-        EditText edit = new EditText(requireContext());
-        edit.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-        input.addView(edit);
-        parent.addView(input);
-        return edit;
+        ((TextView) view.findViewById(R.id.tvAdminUsername))
+                .setText("@" + (admin.tenDangNhap == null ? "" : admin.tenDangNhap));
     }
 
     private void xacNhanDangXuat() {
@@ -116,9 +105,5 @@ public class AdminAccountFragment extends Fragment {
                     requireActivity().finish();
                 })
                 .show();
-    }
-
-    private static String giaTri(String value) {
-        return value == null || value.trim().isEmpty() ? "Chưa cập nhật" : value;
     }
 }
