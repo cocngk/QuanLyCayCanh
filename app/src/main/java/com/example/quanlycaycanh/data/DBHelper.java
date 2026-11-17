@@ -2,6 +2,7 @@ package com.example.quanlycaycanh.data;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
@@ -233,7 +234,7 @@ public class DBHelper extends SQLiteOpenHelper {
     }
 
     private static boolean hasColumn(SQLiteDatabase db, String table, String column) {
-        try (android.database.Cursor c = db.rawQuery("PRAGMA table_info(" + table + ")", null)) {
+        try (Cursor c = db.rawQuery("PRAGMA table_info(" + table + ")", null)) {
             int nameIndex = c.getColumnIndexOrThrow("name");
             while (c.moveToNext()) {
                 if (column.equalsIgnoreCase(c.getString(nameIndex))) {

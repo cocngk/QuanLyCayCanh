@@ -6,6 +6,7 @@ import android.text.TextWatcher;
 import android.util.SparseIntArray;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -51,7 +52,7 @@ public class CreateOrderActivity extends AppCompatActivity {
         edSoDienThoai = findViewById(R.id.edSoDienThoai);
         spThanhToan = findViewById(R.id.spThanhToan);
 
-        android.widget.ImageButton btnQuayLai = findViewById(R.id.btnQuayLai);
+        ImageButton btnQuayLai = findViewById(R.id.btnQuayLai);
         btnQuayLai.setOnClickListener(v -> finish());
 
         ArrayAdapter<String> spThanhToanAdapter = new ArrayAdapter<>(this,

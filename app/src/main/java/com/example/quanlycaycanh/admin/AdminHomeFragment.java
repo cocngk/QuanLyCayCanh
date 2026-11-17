@@ -55,7 +55,7 @@ public class AdminHomeFragment extends Fragment {
         v.findViewById(R.id.btnQuanLyCayNhanh).setOnClickListener(x ->
                 activity.moTab(R.id.tab_admin_products));
         v.findViewById(R.id.btnTaoHoaDonNhanh).setOnClickListener(x ->
-                startActivity(new android.content.Intent(requireContext(), CreateOrderActivity.class)));
+                startActivity(new Intent(requireContext(), CreateOrderActivity.class)));
         v.findViewById(R.id.btnQuanLyHoaDonNhanh).setOnClickListener(x -> activity.chonTabDonHang());
         v.findViewById(R.id.btnThongKeNhanh).setOnClickListener(x ->
                 activity.moTab(R.id.tab_stats));

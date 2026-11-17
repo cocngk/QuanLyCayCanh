@@ -54,7 +54,7 @@ public class ProductEditActivity extends AppCompatActivity {
                 }
                 try {
                     getContentResolver().takePersistableUriPermission(uri,
-                            android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                            Intent.FLAG_GRANT_READ_URI_PERMISSION);
                 } catch (SecurityException ignored) {
                     // Một số nhà cung cấp ảnh chỉ cấp quyền đọc tạm thời.
                 }
