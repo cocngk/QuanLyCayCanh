@@ -65,6 +65,11 @@
             android:name=".QuanLyHoaDonActivity"
             android:exported="false" />
 
+        <!-- THỐNG KÊ -->
+        <activity
+            android:name=".Statistics"
+            android:exported="false" />
+
         <!-- ĐĂNG NHẬP: MÀN HÌNH KHỞI ĐỘNG -->
         <activity
             android:name=".Login"

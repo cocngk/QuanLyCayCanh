@@ -1045,7 +1045,65 @@ public class DBHelper extends SQLiteOpenHelper {
     }
 
     // ======================================
-    // 18. HÀM BĂM MẬT KHẨU
+    // 18. SẢN PHẨM ĐÃ BÁN TRONG KHOẢNG THỜI GIAN
+    // ======================================
+
+    // Số lượng đã bán của một loại cây, gộp theo cây
+    public static class SoldPlant {
+
+        public final long plantId;
+        public final String plantName;
+        public final int quantity;
+
+        public SoldPlant(
+                long plantId,
+                String plantName,
+                int quantity
+        ) {
+
+            this.plantId = plantId;
+            this.plantName = plantName;
+            this.quantity = quantity;
+        }
+    }
+
+    // Chỉ tính hóa đơn hoàn thành, bỏ hóa đơn đã hủy
+    public List<SoldPlant> getSoldPlants(long from, long to) {
+
+        List<SoldPlant> sold = new ArrayList<>();
+
+        try (Cursor cursor = getReadableDatabase().rawQuery(
+
+                "SELECT ii.plant_id, ii.plant_name, SUM(ii.quantity) " +
+                        "FROM " + TABLE_INVOICE_ITEMS + " ii " +
+                        "INNER JOIN " + TABLE_INVOICES + " i " +
+                        "ON i.id = ii.invoice_id " +
+                        "WHERE i.status = ? AND i.created_at BETWEEN ? AND ? " +
+                        "GROUP BY ii.plant_id, ii.plant_name " +
+                        "ORDER BY SUM(ii.quantity) DESC",
+
+                new String[]{
+                        STATUS_DONE,
+                        String.valueOf(from),
+                        String.valueOf(to)
+                }
+        )) {
+
+            while (cursor.moveToNext()) {
+
+                sold.add(new SoldPlant(
+                        cursor.getLong(0),
+                        cursor.getString(1),
+                        cursor.getInt(2)
+                ));
+            }
+        }
+
+        return sold;
+    }
+
+    // ======================================
+    // 19. HÀM BĂM MẬT KHẨU
     // ======================================
 
     private static byte[] deriveHash(

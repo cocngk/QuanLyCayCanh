@@ -123,51 +123,8 @@ public class Account extends BaseActivity {
         // THANH ĐIỀU HƯỚNG PHÍA DƯỚI
         // =====================================
 
-        // Trang chủ chưa được hoàn thiện
-        findViewById(R.id.navHome).setOnClickListener(v -> {
-
-            Toast.makeText(
-                    this,
-                    "Trang chủ đang được hoàn thiện",
-                    Toast.LENGTH_SHORT
-            ).show();
-        });
-
-        // Quản lý cây cảnh
-        findViewById(R.id.navPlants).setOnClickListener(v -> {
-
-            Toast.makeText(
-                    this,
-                    "Chức năng quản lý cây cảnh đang được tích hợp",
-                    Toast.LENGTH_SHORT
-            ).show();
-        });
-
-        // Hóa đơn
-        findViewById(R.id.navOrders).setOnClickListener(v -> {
-
-            Toast.makeText(
-                    this,
-                    "Chức năng hóa đơn đang được tích hợp",
-                    Toast.LENGTH_SHORT
-            ).show();
-        });
-
-        // Thống kê
-        findViewById(R.id.navStats).setOnClickListener(v -> {
-
-            Toast.makeText(
-                    this,
-                    "Chức năng thống kê đang được tích hợp",
-                    Toast.LENGTH_SHORT
-            ).show();
-        });
-
-        // Đang ở trang Tài khoản
-        findViewById(R.id.navAccount).setOnClickListener(v -> {
-
-            // Không cần chuyển màn hình
-        });
+        // Điều hướng dùng chung, tab Tài khoản tự bỏ qua
+        BottomNav.bind(this);
     }
 
     // =====================================
