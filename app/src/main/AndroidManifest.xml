@@ -13,6 +13,11 @@
 
         <activity android:name=".PlantManagementActivity" android:exported="false" />
         <activity android:name=".AddEditPlantActivity" android:exported="false" />
+        <activity android:name=".InvoiceManagementActivity" android:exported="false" />
+        <activity
+            android:name=".CreateInvoiceActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
 
         <activity
             android:name=".About"

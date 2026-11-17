@@ -85,9 +85,9 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.btnFilter).setOnClickListener(v -> openPlants());
 
         // HÓA ĐƠN
-        btnCreateBill.setOnClickListener(v -> showNotAvailable());
-        btnBills.setOnClickListener(v -> showNotAvailable());
-        navBills.setOnClickListener(v -> showNotAvailable());
+        btnCreateBill.setOnClickListener(v -> openCreateInvoice());
+        btnBills.setOnClickListener(v -> openInvoiceManagement());
+        navBills.setOnClickListener(v -> openInvoiceManagement());
 
         // TRANG CHỦ
         navHome.setOnClickListener(v -> {
@@ -116,12 +116,11 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    // THÔNG BÁO CHỨC NĂNG CHƯA TẠO
-    private void showNotAvailable() {
-        Toast.makeText(
-                MainActivity.this,
-                "Chức năng đang được xây dựng!",
-                Toast.LENGTH_SHORT
-        ).show();
+    private void openCreateInvoice() {
+        startActivity(new Intent(this, CreateInvoiceActivity.class));
+    }
+
+    private void openInvoiceManagement() {
+        startActivity(new Intent(this, InvoiceManagementActivity.class));
     }
 }

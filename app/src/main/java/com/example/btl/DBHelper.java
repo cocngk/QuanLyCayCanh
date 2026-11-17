@@ -23,7 +23,7 @@ public class DBHelper extends SQLiteOpenHelper {
     private static final String DB_NAME = "caycanh.db";
 
     // Tăng phiên bản để cập nhật cấu trúc bảng
-    private static final int DB_VERSION = 3;
+    private static final int DB_VERSION = 4;
 
     // Tên bảng
     private static final String TABLE_USERS = "users";
@@ -75,6 +75,13 @@ public class DBHelper extends SQLiteOpenHelper {
         createUsersTable(db);
         PlantDatabase.createTable(db);
         PlantDatabase.seedData(db, appContext.getPackageName());
+        InvoiceDatabase.createTables(db);
+    }
+
+    @Override
+    public void onConfigure(SQLiteDatabase db) {
+        super.onConfigure(db);
+        db.setForeignKeyConstraintsEnabled(true);
     }
 
     private void createUsersTable(SQLiteDatabase db) {
@@ -146,6 +153,9 @@ public class DBHelper extends SQLiteOpenHelper {
         if (oldVersion < 3) {
             PlantDatabase.createTable(db);
             PlantDatabase.seedData(db, appContext.getPackageName());
+        }
+        if (oldVersion < 4) {
+            InvoiceDatabase.createTables(db);
         }
     }
 
