@@ -18,7 +18,7 @@
 
         android:supportsRtl="true"
 
-        android:theme="@style/Theme.Btl">
+        android:theme="@style/Theme.QuanLyCayCanh">
 
         <!-- GIỚI THIỆU -->
         <activity
