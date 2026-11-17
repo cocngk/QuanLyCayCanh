@@ -126,11 +126,7 @@ public final class Ui {
     }
 
     public static GradientDrawable pill(Context c, int mauNen) {
-        GradientDrawable d = new GradientDrawable();
-        d.setShape(GradientDrawable.RECTANGLE);
-        d.setCornerRadius(dp(c, 20));
-        d.setColor(mauNen);
-        return d;
+        return boTron(c, mauNen, 20);
     }
 
     public static int nenDanhMuc(Context c, int maLoai) {
