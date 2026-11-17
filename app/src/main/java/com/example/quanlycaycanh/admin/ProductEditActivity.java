@@ -35,7 +35,7 @@ public class ProductEditActivity extends AppCompatActivity {
 
     private Repository repo;
     private SanPham sanPham;
-    private List<LoaiCay> loaiCays = new ArrayList<>();
+    private List<LoaiCay> loaiCays;
     private Spinner spLoai;
     private TextInputEditText edTen;
     private TextInputEditText edGia;
