@@ -3,15 +3,17 @@ plugins {
 }
 
 android {
-    namespace = "com.example.quanlycaycanh"
+    namespace = "com.example.btl"
     compileSdk {
-        version = release(37)
+        version = release(36) {
+            minorApiLevel = 1
+        }
     }
 
     defaultConfig {
-        applicationId = "com.example.quanlycaycanh"
-        minSdk = 34
-        targetSdk = 37
+        applicationId = "com.example.btl"
+        minSdk = 33
+        targetSdk = 36
         versionCode = 1
         versionName = "1.0"
 
@@ -20,9 +22,11 @@ android {
 
     buildTypes {
         release {
-            optimization {
-                enable = false
-            }
+            isMinifyEnabled = false
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
         }
     }
     compileOptions {

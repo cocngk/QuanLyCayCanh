@@ -22,6 +22,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "QuanLyCayCanh"
+rootProject.name = "btl"
 include(":app")
  
