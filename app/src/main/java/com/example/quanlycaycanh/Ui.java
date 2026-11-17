@@ -178,11 +178,4 @@ public final class Ui {
         return false;
     }
 
-    public static void an(View v) {
-        v.setVisibility(View.GONE);
-    }
-
-    public static void hien(View v) {
-        v.setVisibility(View.VISIBLE);
-    }
 }
