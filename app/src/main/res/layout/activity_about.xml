@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#F5F5F5">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:background="#2E7D32"
+        android:paddingHorizontal="16dp">
+
+        <ImageView
+            android:id="@+id/btnBack"
+            android:layout_width="40dp"
+            android:layout_height="match_parent"
+            android:padding="10dp"
+            android:src="@drawable/ic_back"
+            android:contentDescription="Quay lại"
+            android:clickable="true"
+            android:focusable="true"
+            android:tint="#FFFFFF"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Giới thiệu ứng dụng"
+            android:textSize="21sp"
+            android:textStyle="bold"
+            android:textColor="#FFFFFF"/>
+    </LinearLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="24dp">
+
+            <ImageView
+                android:layout_width="85dp"
+                android:layout_height="85dp"
+                android:layout_gravity="center"
+                android:src="@drawable/logo"
+                android:contentDescription="Biểu tượng cây cảnh"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:gravity="center"
+                android:text="QUẢN LÝ CỬA HÀNG CÂY CẢNH"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="#2E7D32"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:gravity="center"
+                android:text="Phiên bản 1.0"
+                android:textSize="14sp"
+                android:textColor="#777777"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                android:text="Giới thiệu"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="#2E7D32"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="Ứng dụng Quản lý cửa hàng cây cảnh giúp người dùng quản lý cây cảnh, đơn hàng và theo dõi hoạt động kinh doanh một cách dễ dàng, thuận tiện."
+                android:textSize="15sp"
+                android:lineSpacingExtra="5dp"
+                android:textColor="#444444"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="28dp"
+                android:text="Chức năng chính"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="#2E7D32"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:text="• Quản lý danh sách cây cảnh&#10;&#10;• Thêm, sửa và xóa cây cảnh&#10;&#10;• Quản lý đơn hàng&#10;&#10;• Thống kê hoạt động kinh doanh&#10;&#10;• Quản lý tài khoản cá nhân&#10;&#10;• Theo dõi thông báo cửa hàng"
+                android:textSize="15sp"
+                android:textColor="#444444"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="28dp"
+                android:text="Thông tin ứng dụng"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="#2E7D32"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:text="Tên ứng dụng: Quản lý cửa hàng cây cảnh&#10;&#10;Phiên bản: 1.0&#10;&#10;Nền tảng: Android&#10;&#10;Ngôn ngữ: Java, XML"
+                android:textSize="15sp"
+                android:textColor="#444444"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="35dp"
+                android:gravity="center"
+                android:text="© 2026 - Quản lý cửa hàng cây cảnh"
+                android:textSize="13sp"
+                android:textColor="#888888"/>
+
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

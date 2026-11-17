@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:background="@color/screen_background" android:orientation="vertical">
+
+    <LinearLayout android:layout_width="match_parent" android:layout_height="56dp"
+        android:gravity="center_vertical" android:orientation="horizontal"
+        android:background="@color/green_primary" android:paddingHorizontal="12dp">
+        <ImageButton android:id="@+id/btnBackForm" android:layout_width="40dp"
+            android:layout_height="40dp" android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_plant_back" app:tint="@color/white"
+            android:contentDescription="Quay lại" />
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginStart="8dp" android:id="@+id/tvFormTitle" android:text="Thêm cây cảnh"
+            android:textSize="20sp" android:textStyle="bold"
+            android:textColor="@color/white" />
+    </LinearLayout>
+
+    <ScrollView android:layout_width="match_parent" android:layout_height="0dp"
+        android:layout_weight="1" android:fillViewport="false" android:clipToPadding="false">
+        <androidx.cardview.widget.CardView android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:layout_margin="14dp"
+            app:cardCornerRadius="12dp" app:cardElevation="2dp"
+            app:cardBackgroundColor="@color/white" app:cardUseCompatPadding="true">
+
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="vertical" android:padding="16dp">
+                <FrameLayout android:id="@+id/imagePickerBox"
+                    android:layout_width="128dp" android:layout_height="112dp"
+                    android:layout_gravity="center_horizontal"
+                    android:background="@drawable/bg_image_select"
+                    android:clickable="true" android:focusable="true"
+                    android:contentDescription="Chọn ảnh cây cảnh từ thư viện">
+                    <LinearLayout android:id="@+id/imagePlaceholder"
+                        android:layout_width="match_parent" android:layout_height="match_parent"
+                        android:gravity="center" android:orientation="vertical">
+                        <ImageView android:layout_width="43dp" android:layout_height="43dp"
+                            android:src="@drawable/ic_plant_image" app:tint="@color/green_primary"
+                            android:contentDescription="@null" />
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp" android:text="＋ Chọn ảnh cây cảnh"
+                            android:textSize="11sp" android:textColor="@color/text_primary" />
+                    </LinearLayout>
+                    <ImageView android:id="@+id/imgChosen" android:layout_width="match_parent"
+                        android:layout_height="match_parent" android:scaleType="centerCrop"
+                        android:visibility="gone" android:contentDescription="Ảnh cây đã chọn" />
+                </FrameLayout>
+
+                <TextView android:id="@+id/lblName" android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" android:layout_marginTop="18dp"
+                    android:drawableStart="@drawable/ic_tree" android:drawableTint="@color/green_primary"
+                    android:drawablePadding="6dp" android:text="Tên cây cảnh *"
+                    android:textSize="14sp" android:textStyle="bold"
+                    android:textColor="@color/text_primary" />
+                <EditText android:id="@+id/etName" android:layout_width="match_parent"
+                    android:layout_height="52dp" android:layout_marginTop="7dp"
+                    android:background="@drawable/bg_input" android:paddingHorizontal="12dp"
+                    android:hint="Nhập tên cây cảnh..." android:singleLine="true"
+                    android:inputType="textCapWords" android:textSize="14sp"
+                    android:textColor="@color/text_primary" android:textColorHint="@color/text_secondary" />
+
+                <TextView android:id="@+id/lblCategory" android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" android:layout_marginTop="17dp"
+                    android:drawableStart="@drawable/ic_category" android:drawableTint="@color/green_primary"
+                    android:drawablePadding="6dp" android:text="Loại cây *"
+                    android:textSize="14sp" android:textStyle="bold"
+                    android:textColor="@color/text_primary" />
+                <FrameLayout android:layout_width="match_parent" android:layout_height="52dp"
+                    android:layout_marginTop="7dp" android:background="@drawable/bg_input">
+                    <Spinner android:id="@+id/spCategory" android:layout_width="match_parent"
+                        android:layout_height="match_parent" android:paddingStart="12dp"
+                        android:paddingEnd="28dp" android:background="@android:color/transparent"
+                        android:spinnerMode="dropdown" />
+                    <ImageView android:layout_width="20dp" android:layout_height="20dp"
+                        android:layout_gravity="end|center_vertical" android:layout_marginEnd="12dp"
+                        android:src="@drawable/ic_down" app:tint="@color/text_primary"
+                        android:contentDescription="@null" />
+                </FrameLayout>
+
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:orientation="horizontal" android:layout_marginTop="17dp">
+                    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+                        android:layout_weight="1" android:orientation="vertical"
+                        android:layout_marginEnd="7dp">
+                        <TextView android:id="@+id/lblPrice" android:layout_width="match_parent"
+                            android:layout_height="wrap_content" android:drawableStart="@drawable/ic_price"
+                            android:drawableTint="@color/green_primary" android:drawablePadding="5dp"
+                            android:text="Giá bán (đ) *" android:textSize="13sp"
+                            android:textStyle="bold" android:textColor="@color/text_primary" />
+                        <EditText android:id="@+id/etPrice" android:layout_width="match_parent"
+                            android:layout_height="52dp" android:layout_marginTop="7dp"
+                            android:background="@drawable/bg_input" android:paddingHorizontal="10dp"
+                            android:inputType="numberDecimal" android:hint="Nhập giá bán..."
+                            android:singleLine="true" android:textSize="13sp"
+                            android:textColor="@color/text_primary" android:textColorHint="@color/text_secondary" />
+                    </LinearLayout>
+                    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+                        android:layout_weight="1" android:orientation="vertical"
+                        android:layout_marginStart="7dp">
+                        <TextView android:id="@+id/lblStock" android:layout_width="match_parent"
+                            android:layout_height="wrap_content" android:drawableStart="@drawable/ic_box"
+                            android:drawableTint="@color/green_primary" android:drawablePadding="5dp"
+                            android:text="Số lượng *" android:textSize="13sp"
+                            android:textStyle="bold" android:textColor="@color/text_primary" />
+                        <EditText android:id="@+id/etStock" android:layout_width="match_parent"
+                            android:layout_height="52dp" android:layout_marginTop="7dp"
+                            android:background="@drawable/bg_input" android:paddingHorizontal="10dp"
+                            android:inputType="number" android:hint="Nhập số lượng..."
+                            android:singleLine="true" android:textSize="13sp"
+                            android:textColor="@color/text_primary" android:textColorHint="@color/text_secondary" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:layout_marginTop="17dp" android:drawableStart="@drawable/ic_note"
+                    android:drawableTint="@color/green_primary" android:drawablePadding="6dp"
+                    android:text="Mô tả" android:textSize="14sp" android:textStyle="bold"
+                    android:textColor="@color/text_primary" />
+                <EditText android:id="@+id/etDescription" android:layout_width="match_parent"
+                    android:layout_height="112dp" android:layout_marginTop="7dp"
+                    android:background="@drawable/bg_input" android:padding="12dp"
+                    android:inputType="textMultiLine|textCapSentences"
+                    android:gravity="top" android:minLines="4"
+                    android:hint="Nhập mô tả cây cảnh..." android:textSize="14sp"
+                    android:textColor="@color/text_primary" android:textColorHint="@color/text_secondary" />
+
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:orientation="horizontal" android:layout_marginTop="20dp">
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnCancel" android:layout_width="0dp"
+                        android:layout_height="52dp" android:layout_weight="1"
+                        android:layout_marginEnd="6dp" android:text="Hủy"
+                        android:textAllCaps="false" android:textStyle="bold" android:textSize="15sp"
+                        android:textColor="@color/green_primary"
+                        android:insetTop="0dp" android:insetBottom="0dp"
+                        app:cornerRadius="10dp" app:strokeWidth="1dp"
+                        app:backgroundTint="@color/white" app:strokeColor="@color/green_primary"
+                        app:icon="@drawable/ic_close" app:iconSize="19dp"
+                        app:iconTint="@color/green_primary" app:iconPadding="6dp"
+                        app:iconGravity="textStart" />
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnSave" android:layout_width="0dp"
+                        android:layout_height="52dp" android:layout_weight="1"
+                        android:layout_marginStart="6dp" android:text="Lưu"
+                        android:textAllCaps="false" android:textStyle="bold" android:textSize="15sp"
+                        android:textColor="@color/white"
+                        android:insetTop="0dp" android:insetBottom="0dp"
+                        app:cornerRadius="10dp" app:backgroundTint="@color/green_primary"
+                        app:icon="@drawable/ic_plant_save" app:iconSize="19dp"
+                        app:iconTint="@color/white" app:iconPadding="6dp"
+                        app:iconGravity="textStart" />
+                </LinearLayout>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+    </ScrollView>
+
+    <include layout="@layout/view_bottom_nav" />
+</LinearLayout>

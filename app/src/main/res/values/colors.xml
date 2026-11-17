@@ -2,4 +2,13 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <!-- Màu dùng chung với giao diện Trang chủ của btldidong -->
+    <color name="green_primary">#087A35</color>
+    <color name="green_dark">#164B25</color>
+    <color name="green_soft">#E8F5E9</color>
+    <color name="screen_background">#F5F5F5</color>
+    <color name="danger">#E53935</color>
+    <color name="text_primary">#222222</color>
+    <color name="text_secondary">#666666</color>
+    <color name="input_border">#D0D7D0</color>
 </resources>
