@@ -120,7 +120,7 @@
             android:layout_marginTop="20dp"
             android:layout_gravity="center"
             android:padding="10dp"
-            android:text="Chưa có tài khoản? Đăng ký tài khoản mới"
+            android:text="Chưa có tài khoản? Đăng ký"
             android:textColor="#2E7D32"
             android:textStyle="bold"
             android:textSize="15sp"/>

@@ -55,7 +55,6 @@ public class Login extends AppCompatActivity {
         btnLogin = findViewById(R.id.btnLogin);
         tvRegister = findViewById(R.id.tvRegister);
         imgEye = findViewById(R.id.imgEye);
-        updateRegistrationAvailability();
 
         // Xử lý đăng nhập
         btnLogin.setOnClickListener(v -> {
@@ -144,18 +143,6 @@ public class Login extends AppCompatActivity {
             edtPassword.setSelection(
                     edtPassword.getText().length());
         });
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        updateRegistrationAvailability();
-    }
-
-    private void updateRegistrationAvailability() {
-        if (tvRegister == null) return;
-        tvRegister.setText("Chưa có tài khoản? Đăng ký tài khoản mới");
-        tvRegister.setVisibility(TextView.VISIBLE);
     }
 
     // MỞ TRANG CHỦ SAU ĐĂNG NHẬP
