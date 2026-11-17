@@ -16,3 +16,6 @@ local.properties
 
 # Báo cáo / tài liệu nội bộ — không đưa lên git
 /docs/
+
+# Ignore Markdown documentation and reports
+*.md
