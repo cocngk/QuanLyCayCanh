@@ -12,6 +12,8 @@ import android.util.Patterns;
 import java.security.GeneralSecurityException;
 import java.security.MessageDigest;
 import java.security.SecureRandom;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 import javax.crypto.SecretKeyFactory;
@@ -23,10 +25,17 @@ public class DBHelper extends SQLiteOpenHelper {
     private static final String DB_NAME = "caycanh.db";
 
     // Tăng phiên bản để cập nhật cấu trúc bảng
-    private static final int DB_VERSION = 2;
+    private static final int DB_VERSION = 3;
 
     // Tên bảng
     private static final String TABLE_USERS = "users";
+    private static final String TABLE_PLANTS = "plants";
+    private static final String TABLE_INVOICES = "invoices";
+    private static final String TABLE_INVOICE_ITEMS = "invoice_items";
+
+    // Trạng thái hóa đơn
+    public static final String STATUS_DONE = "DONE";
+    public static final String STATUS_CANCELLED = "CANCELLED";
 
     // Lớp chứa thông tin người dùng
     public static class User {
@@ -57,10 +66,116 @@ public class DBHelper extends SQLiteOpenHelper {
         }
     }
 
+    // Lớp chứa thông tin cây cảnh
+    public static class Plant {
+
+        public final long id;
+        public final String name;
+        public final String category;
+        public final long price;
+        public final int stock;
+
+        // Tên file drawable của ảnh cây, có thể null
+        public final String image;
+
+        public Plant(
+                long id,
+                String name,
+                String category,
+                long price,
+                int stock,
+                String image
+        ) {
+
+            this.id = id;
+            this.name = name;
+            this.category = category;
+            this.price = price;
+            this.stock = stock;
+            this.image = image;
+        }
+    }
+
+    // Một dòng cây cảnh trong hóa đơn.
+    // Chỉ số lượng thay đổi được, giá và tên giữ nguyên tại thời điểm lập hóa đơn.
+    public static class InvoiceItem {
+
+        public final long plantId;
+        public final String plantName;
+        public final long unitPrice;
+        public int quantity;
+
+        public InvoiceItem(
+                long plantId,
+                String plantName,
+                long unitPrice,
+                int quantity
+        ) {
+
+            this.plantId = plantId;
+            this.plantName = plantName;
+            this.unitPrice = unitPrice;
+            this.quantity = quantity;
+        }
+
+        public long getAmount() {
+
+            return unitPrice * quantity;
+        }
+    }
+
+    // Thông tin một hóa đơn đã lưu
+    public static class Invoice {
+
+        public final long id;
+        public final String code;
+        public final String customerName;
+        public final String customerPhone;
+        public final long createdAt;
+        public final long total;
+        public final String status;
+        public final int itemCount;
+
+        public Invoice(
+                long id,
+                String code,
+                String customerName,
+                String customerPhone,
+                long createdAt,
+                long total,
+                String status,
+                int itemCount
+        ) {
+
+            this.id = id;
+            this.code = code;
+            this.customerName = customerName;
+            this.customerPhone = customerPhone;
+            this.createdAt = createdAt;
+            this.total = total;
+            this.status = status;
+            this.itemCount = itemCount;
+        }
+
+        public boolean isCancelled() {
+
+            return STATUS_CANCELLED.equals(status);
+        }
+    }
+
     // Khởi tạo SQLite
     public DBHelper(Context context) {
 
         super(context, DB_NAME, null, DB_VERSION);
+    }
+
+    // Bật kiểm tra khóa ngoại
+    @Override
+    public void onConfigure(SQLiteDatabase db) {
+
+        super.onConfigure(db);
+
+        db.setForeignKeyConstraintsEnabled(true);
     }
 
     // ======================================
@@ -71,6 +186,11 @@ public class DBHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
 
         createUsersTable(db);
+
+        // Bảng cho phần hóa đơn (Người 4)
+        createInvoiceTables(db);
+
+        seedPlants(db);
     }
 
     private void createUsersTable(SQLiteDatabase db) {
@@ -137,6 +257,13 @@ public class DBHelper extends SQLiteOpenHelper {
 
             // Chỉ xóa bảng cũ sau khi chuyển thành công
             db.execSQL("DROP TABLE users_old");
+        }
+
+        if (oldVersion < 3) {
+
+            createInvoiceTables(db);
+
+            seedPlants(db);
         }
     }
 
@@ -564,7 +691,361 @@ public class DBHelper extends SQLiteOpenHelper {
     }
 
     // ======================================
-    // 11. HÀM BĂM MẬT KHẨU
+    // 11. TẠO BẢNG CÂY CẢNH VÀ HÓA ĐƠN
+    // ======================================
+
+    private void createInvoiceTables(SQLiteDatabase db) {
+
+        // Cây cảnh trong cửa hàng
+        db.execSQL(
+                "CREATE TABLE " + TABLE_PLANTS + " (" +
+                        "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                        "name TEXT NOT NULL, " +
+                        "category TEXT NOT NULL, " +
+                        "price INTEGER NOT NULL, " +
+                        "stock INTEGER NOT NULL DEFAULT 0, " +
+                        "image TEXT)"
+        );
+
+        // Hóa đơn bán hàng
+        db.execSQL(
+                "CREATE TABLE " + TABLE_INVOICES + " (" +
+                        "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                        "code TEXT NOT NULL UNIQUE, " +
+                        "customer_name TEXT NOT NULL, " +
+                        "customer_phone TEXT, " +
+                        "created_at INTEGER NOT NULL, " +
+                        "total INTEGER NOT NULL, " +
+                        "status TEXT NOT NULL)"
+        );
+
+        // Các dòng cây cảnh của hóa đơn
+        db.execSQL(
+                "CREATE TABLE " + TABLE_INVOICE_ITEMS + " (" +
+                        "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                        "invoice_id INTEGER NOT NULL, " +
+                        "plant_id INTEGER, " +
+                        "plant_name TEXT NOT NULL, " +
+                        "unit_price INTEGER NOT NULL, " +
+                        "quantity INTEGER NOT NULL, " +
+                        "FOREIGN KEY(invoice_id) REFERENCES " +
+                        TABLE_INVOICES + "(id) ON DELETE CASCADE)"
+        );
+    }
+
+    // ======================================
+    // 12. DỮ LIỆU MẪU CHO BẢNG CÂY CẢNH
+    // (màn quản lý cây cảnh là phần của Người 3)
+    // ======================================
+
+    private void seedPlants(SQLiteDatabase db) {
+
+        // Bảng đã có cây cảnh thì không thêm nữa
+        try (Cursor cursor = db.rawQuery(
+                "SELECT COUNT(*) FROM " + TABLE_PLANTS,
+                null
+        )) {
+
+            if (cursor.moveToFirst() && cursor.getInt(0) > 0) {
+
+                return;
+            }
+        }
+
+        addPlant(db, "Cây lưỡi hổ", "Cây nội thất", 120000, 35, "luoi_ho");
+        addPlant(db, "Cây trầu bà", "Cây để bàn", 90000, 40, "sen");
+        addPlant(db, "Cây kim tiền", "Cây phong thủy", 150000, 20, "kim_tien");
+        addPlant(db, "Cẩm tú cầu", "Cây cảnh hoa", 250000, 12, "sen_da");
+        addPlant(db, "Cây tùng mini", "Cây phong thủy", 180000, 15, "bonsai");
+        addPlant(db, "Cây kim ngân", "Cây phong thủy", 210000, 8, "kim_ngan");
+    }
+
+    private void addPlant(
+            SQLiteDatabase db,
+            String name,
+            String category,
+            long price,
+            int stock,
+            String image
+    ) {
+
+        ContentValues values = new ContentValues();
+
+        values.put("name", name);
+        values.put("category", category);
+        values.put("price", price);
+        values.put("stock", stock);
+        values.put("image", image);
+
+        db.insert(TABLE_PLANTS, null, values);
+    }
+
+    // ======================================
+    // 13. LẤY CÂY CẢNH
+    // ======================================
+
+    public Plant getPlant(long plantId) {
+
+        try (Cursor cursor = getReadableDatabase().rawQuery(
+
+                "SELECT id, name, category, price, stock, image " +
+                        "FROM " + TABLE_PLANTS + " WHERE id = ? LIMIT 1",
+
+                new String[]{String.valueOf(plantId)}
+        )) {
+
+            if (!cursor.moveToFirst()) {
+
+                return null;
+            }
+
+            return new Plant(
+                    cursor.getLong(0),
+                    cursor.getString(1),
+                    cursor.getString(2),
+                    cursor.getLong(3),
+                    cursor.getInt(4),
+                    cursor.getString(5)
+            );
+        }
+    }
+
+    public List<Plant> getPlants(String keyword) {
+
+        String like = "%" + keyword.trim() + "%";
+
+        List<Plant> plants = new ArrayList<>();
+
+        try (Cursor cursor = getReadableDatabase().rawQuery(
+
+                "SELECT id, name, category, price, stock, image " +
+                        "FROM " + TABLE_PLANTS + " " +
+                        "WHERE name LIKE ? OR category LIKE ? " +
+                        "ORDER BY name",
+
+                new String[]{like, like}
+        )) {
+
+            while (cursor.moveToNext()) {
+
+                plants.add(new Plant(
+                        cursor.getLong(0),
+                        cursor.getString(1),
+                        cursor.getString(2),
+                        cursor.getLong(3),
+                        cursor.getInt(4),
+                        cursor.getString(5)
+                ));
+            }
+        }
+
+        return plants;
+    }
+
+    // ======================================
+    // 14. LẤY DANH SÁCH HÓA ĐƠN (MỚI NHẤT TRƯỚC)
+    // ======================================
+
+    public List<Invoice> getInvoices() {
+
+        List<Invoice> invoices = new ArrayList<>();
+
+        try (Cursor cursor = getReadableDatabase().rawQuery(
+
+                "SELECT i.id, i.code, i.customer_name, i.customer_phone, " +
+                        "i.created_at, i.total, i.status, " +
+                        "(SELECT COUNT(*) FROM " + TABLE_INVOICE_ITEMS +
+                        " WHERE invoice_id = i.id) " +
+                        "FROM " + TABLE_INVOICES + " i " +
+                        "ORDER BY i.created_at DESC, i.id DESC",
+
+                null
+        )) {
+
+            while (cursor.moveToNext()) {
+
+                invoices.add(new Invoice(
+                        cursor.getLong(0),
+                        cursor.getString(1),
+                        cursor.getString(2),
+                        cursor.getString(3),
+                        cursor.getLong(4),
+                        cursor.getLong(5),
+                        cursor.getString(6),
+                        cursor.getInt(7)
+                ));
+            }
+        }
+
+        return invoices;
+    }
+
+    // ======================================
+    // 15. LẤY CÁC DÒNG CỦA MỘT HÓA ĐƠN
+    // ======================================
+
+    public List<InvoiceItem> getInvoiceItems(long invoiceId) {
+
+        List<InvoiceItem> items = new ArrayList<>();
+
+        try (Cursor cursor = getReadableDatabase().rawQuery(
+
+                "SELECT plant_id, plant_name, unit_price, quantity " +
+                        "FROM " + TABLE_INVOICE_ITEMS + " " +
+                        "WHERE invoice_id = ? ORDER BY id",
+
+                new String[]{String.valueOf(invoiceId)}
+        )) {
+
+            while (cursor.moveToNext()) {
+
+                items.add(new InvoiceItem(
+                        cursor.getLong(0),
+                        cursor.getString(1),
+                        cursor.getLong(2),
+                        cursor.getInt(3)
+                ));
+            }
+        }
+
+        return items;
+    }
+
+    // ======================================
+    // 16. TẠO HÓA ĐƠN VÀ TRỪ TỒN KHO
+    // ======================================
+
+    public long createInvoice(
+            String customerName,
+            String customerPhone,
+            List<InvoiceItem> items
+    ) {
+
+        if (customerName.trim().isEmpty() || items.isEmpty()) {
+
+            return -1;
+        }
+
+        long total = 0;
+
+        for (InvoiceItem item : items) {
+
+            total += item.getAmount();
+        }
+
+        SQLiteDatabase db = getWritableDatabase();
+
+        db.beginTransaction();
+
+        try {
+
+            // Số thứ tự tiếp theo, dùng làm id và mã hóa đơn
+            long id = db.compileStatement(
+                    "SELECT IFNULL(MAX(id), 0) + 1 FROM " + TABLE_INVOICES
+            ).simpleQueryForLong();
+
+            String phone = customerPhone.trim();
+
+            ContentValues invoice = new ContentValues();
+
+            invoice.put("id", id);
+            invoice.put(
+                    "code",
+                    String.format(Locale.ROOT, "HD%06d", id)
+            );
+            invoice.put("customer_name", customerName.trim());
+            invoice.put("customer_phone", phone.isEmpty() ? null : phone);
+            invoice.put("created_at", System.currentTimeMillis());
+            invoice.put("total", total);
+            invoice.put("status", STATUS_DONE);
+
+            db.insertOrThrow(TABLE_INVOICES, null, invoice);
+
+            for (InvoiceItem item : items) {
+
+                ContentValues line = new ContentValues();
+
+                line.put("invoice_id", id);
+                line.put("plant_id", item.plantId);
+                line.put("plant_name", item.plantName);
+                line.put("unit_price", item.unitPrice);
+                line.put("quantity", item.quantity);
+
+                db.insertOrThrow(TABLE_INVOICE_ITEMS, null, line);
+
+                db.execSQL(
+                        "UPDATE " + TABLE_PLANTS +
+                                " SET stock = stock - ? WHERE id = ?",
+                        new Object[]{item.quantity, item.plantId}
+                );
+            }
+
+            db.setTransactionSuccessful();
+
+            return id;
+
+        } finally {
+
+            db.endTransaction();
+        }
+    }
+
+    // ======================================
+    // 17. HỦY HÓA ĐƠN VÀ TRẢ LẠI TỒN KHO
+    // ======================================
+
+    public boolean cancelInvoice(long invoiceId) {
+
+        SQLiteDatabase db = getWritableDatabase();
+
+        db.beginTransaction();
+
+        try {
+
+            ContentValues values = new ContentValues();
+
+            values.put("status", STATUS_CANCELLED);
+
+            // Chỉ hóa đơn đang ở trạng thái hoàn thành mới hủy được
+            int updated = db.update(
+                    TABLE_INVOICES,
+                    values,
+                    "id = ? AND status = ?",
+                    new String[]{
+                            String.valueOf(invoiceId),
+                            STATUS_DONE
+                    }
+            );
+
+            if (updated != 1) {
+
+                return false;
+            }
+
+            for (InvoiceItem item : getInvoiceItems(invoiceId)) {
+
+                if (item.plantId > 0) {
+
+                    db.execSQL(
+                            "UPDATE " + TABLE_PLANTS +
+                                    " SET stock = stock + ? WHERE id = ?",
+                            new Object[]{item.quantity, item.plantId}
+                    );
+                }
+            }
+
+            db.setTransactionSuccessful();
+
+            return true;
+
+        } finally {
+
+            db.endTransaction();
+        }
+    }
+
+    // ======================================
+    // 18. HÀM BĂM MẬT KHẨU
     // ======================================
 
     private static byte[] deriveHash(

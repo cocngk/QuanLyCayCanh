@@ -51,7 +51,7 @@ public class Login extends AppCompatActivity {
                 && savedUserId > 0
                 && dbHelper.getUser(savedUserId) != null) {
 
-            openAccount();
+            openHome();
 
             return;
         }
@@ -137,7 +137,7 @@ public class Login extends AppCompatActivity {
                         Toast.LENGTH_SHORT
                 ).show();
 
-                openAccount();
+                openHome();
 
             } else {
 
@@ -204,14 +204,14 @@ public class Login extends AppCompatActivity {
     // MỞ TRANG SAU ĐĂNG NHẬP
     // ===================================
 
-    private void openAccount() {
+    private void openHome() {
 
-        // Tạm vào trang Quản lý tài khoản
-        // vì trang chủ trong file ZIP vẫn chưa hoàn thiện.
+        // Trang chủ tạm (MainActivity) giữ các lối vào chức năng.
+        // Trang chủ chính thức là phần của Người 2.
 
         Intent intent = new Intent(
                 Login.this,
-                Account.class
+                MainActivity.class
         );
 
         startActivity(intent);

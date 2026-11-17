@@ -55,6 +55,16 @@
             android:name=".MainActivity"
             android:exported="false" />
 
+        <!-- TẠO HÓA ĐƠN -->
+        <activity
+            android:name=".TaoHoaDonActivity"
+            android:exported="false" />
+
+        <!-- QUẢN LÝ HÓA ĐƠN -->
+        <activity
+            android:name=".QuanLyHoaDonActivity"
+            android:exported="false" />
+
         <!-- ĐĂNG NHẬP: MÀN HÌNH KHỞI ĐỘNG -->
         <activity
             android:name=".Login"
