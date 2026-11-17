@@ -301,13 +301,6 @@ public class DBHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = getWritableDatabase();
         db.beginTransaction();
         try {
-            // This app has one local administrator. Never expose an open
-            // self-registration path after the first account is created.
-            try (Cursor cursor = db.rawQuery("SELECT COUNT(*) FROM " + TABLE_USERS, null)) {
-                if (cursor.moveToFirst() && cursor.getInt(0) > 0) {
-                    return -1;
-                }
-            }
             long userId = db.insertOrThrow(TABLE_USERS, null, values);
             db.setTransactionSuccessful();
             return userId;

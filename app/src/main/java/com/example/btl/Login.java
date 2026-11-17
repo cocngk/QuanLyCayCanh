@@ -153,13 +153,9 @@ public class Login extends AppCompatActivity {
     }
 
     private void updateRegistrationAvailability() {
-        if (tvRegister == null || dbHelper == null) return;
-        if (dbHelper.hasUsers()) {
-            tvRegister.setVisibility(TextView.GONE);
-        } else {
-            tvRegister.setVisibility(TextView.VISIBLE);
-            tvRegister.setText("Khởi tạo tài khoản quản trị");
-        }
+        if (tvRegister == null) return;
+        tvRegister.setText("Chưa có tài khoản? Đăng ký tài khoản mới");
+        tvRegister.setVisibility(TextView.VISIBLE);
     }
 
     // MỞ TRANG CHỦ SAU ĐĂNG NHẬP

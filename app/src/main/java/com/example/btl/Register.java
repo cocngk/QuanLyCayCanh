@@ -36,12 +36,6 @@ public class Register extends AppCompatActivity {
 
         // Khởi tạo SQLite
         dbHelper = new DBHelper(this);
-        if (dbHelper.hasUsers()) {
-            Toast.makeText(this,
-                    "Tài khoản quản trị đã được khởi tạo", Toast.LENGTH_LONG).show();
-            finish();
-            return;
-        }
 
         // Ánh xạ XML
         edtFullName = findViewById(R.id.edtFullName);
