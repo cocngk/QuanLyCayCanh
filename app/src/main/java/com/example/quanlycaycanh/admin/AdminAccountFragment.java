@@ -1,7 +1,6 @@
 package com.example.quanlycaycanh.admin;
 
 import android.content.Intent;
-import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -77,8 +76,6 @@ public class AdminAccountFragment extends Fragment {
         View content = ((ViewGroup) card).getChildAt(0);
         ImageView icon = content.findViewById(R.id.imgAction);
         icon.setImageResource(iconRes);
-        icon.setImageTintList(ColorStateList.valueOf(
-                requireContext().getColor(R.color.green)));
         ((TextView) content.findViewById(R.id.tvActionTitle)).setText(title);
         ((TextView) content.findViewById(R.id.tvActionSubtitle)).setText(subtitle);
     }
