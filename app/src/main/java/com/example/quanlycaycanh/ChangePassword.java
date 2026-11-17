@@ -8,9 +8,8 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AppCompatActivity;
 
-public class ChangePassword extends AppCompatActivity {
+public class ChangePassword extends BaseActivity {
 
     // Các ô mật khẩu
     private EditText edtOldPassword;

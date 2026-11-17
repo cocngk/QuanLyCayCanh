@@ -11,9 +11,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AppCompatActivity;
 
-public class Login extends AppCompatActivity {
+public class Login extends BaseActivity {
 
     private EditText edtContact;
     private EditText edtPassword;

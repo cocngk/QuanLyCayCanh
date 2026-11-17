@@ -10,14 +10,13 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
 // Màn hình 5: Tạo hóa đơn (Người 4)
-public class TaoHoaDonActivity extends AppCompatActivity {
+public class TaoHoaDonActivity extends BaseActivity {
 
     private final List<DBHelper.InvoiceItem> selectedItems = new ArrayList<>();
 

@@ -9,9 +9,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AppCompatActivity;
 
-public class Register extends AppCompatActivity {
+public class Register extends BaseActivity {
 
     private EditText edtFullName;
     private EditText edtContact;

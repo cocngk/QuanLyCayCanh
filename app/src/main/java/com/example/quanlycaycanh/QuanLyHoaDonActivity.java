@@ -14,14 +14,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
 // Màn hình 6: Quản lý hóa đơn (Người 4)
-public class QuanLyHoaDonActivity extends AppCompatActivity {
+public class QuanLyHoaDonActivity extends BaseActivity {
 
     private static final String FILTER_ALL = "ALL";
     private static final String FILTER_TODAY = "TODAY";

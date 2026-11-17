@@ -6,9 +6,8 @@ import android.os.Bundle;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AppCompatActivity;
 
-public class Account extends AppCompatActivity {
+public class Account extends BaseActivity {
 
     // Quản lý phiên đăng nhập
     private SessionManager sessionManager;

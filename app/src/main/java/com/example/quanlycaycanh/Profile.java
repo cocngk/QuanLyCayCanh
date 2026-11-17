@@ -8,11 +8,10 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.Locale;
 
-public class Profile extends AppCompatActivity {
+public class Profile extends BaseActivity {
 
     // Các ô nhập liệu
     private EditText edtFullName;

@@ -4,9 +4,8 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AppCompatActivity;
 
-public class Notification extends AppCompatActivity {
+public class Notification extends BaseActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

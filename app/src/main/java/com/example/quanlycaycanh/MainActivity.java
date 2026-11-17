@@ -3,11 +3,10 @@ package com.example.quanlycaycanh;
 import android.content.Intent;
 import android.os.Bundle;
 
-import androidx.appcompat.app.AppCompatActivity;
 
 // Trang chủ tạm: lối vào các màn hình đã làm.
 // Trang chủ chính thức là phần của Người 2.
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends BaseActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

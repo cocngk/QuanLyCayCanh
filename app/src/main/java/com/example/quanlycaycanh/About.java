@@ -2,9 +2,8 @@ package com.example.quanlycaycanh;
 
 import android.os.Bundle;
 
-import androidx.appcompat.app.AppCompatActivity;
 
-public class About extends AppCompatActivity {
+public class About extends BaseActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
