@@ -47,6 +47,7 @@ public class InvoiceDatabase {
                 + "invoice_id INTEGER NOT NULL, "
                 + "plant_id INTEGER, "
                 + "plant_name TEXT NOT NULL, "
+                + "plant_category TEXT NOT NULL DEFAULT 'Khác', "
                 + "unit_price INTEGER NOT NULL CHECK(unit_price >= 0), "
                 + "quantity INTEGER NOT NULL CHECK(quantity > 0), "
                 + "FOREIGN KEY(invoice_id) REFERENCES " + TABLE_INVOICES
@@ -56,6 +57,14 @@ public class InvoiceDatabase {
                 + "ON " + TABLE_INVOICES + "(created_at DESC)");
         db.execSQL("CREATE INDEX IF NOT EXISTS idx_invoice_items_invoice "
                 + "ON " + TABLE_ITEMS + "(invoice_id)");
+    }
+
+    static void migrateToVersion5(SQLiteDatabase db) {
+        db.execSQL("ALTER TABLE " + TABLE_ITEMS
+                + " ADD COLUMN plant_category TEXT NOT NULL DEFAULT 'Khác'");
+        db.execSQL("UPDATE " + TABLE_ITEMS + " SET plant_category = COALESCE("
+                + "(SELECT category FROM plants WHERE plants.id = "
+                + TABLE_ITEMS + ".plant_id), 'Khác') WHERE plant_category = 'Khác'");
     }
 
     public static final class Invoice {
@@ -109,12 +118,49 @@ public class InvoiceDatabase {
         public final int completedCount;
         public final int cancelledCount;
         public final long revenue;
+        public final int productsSold;
 
-        Summary(int totalCount, int completedCount, int cancelledCount, long revenue) {
+        Summary(int totalCount, int completedCount, int cancelledCount,
+                long revenue, int productsSold) {
             this.totalCount = totalCount;
             this.completedCount = completedCount;
             this.cancelledCount = cancelledCount;
             this.revenue = revenue;
+            this.productsSold = productsSold;
+        }
+    }
+
+    public static final class DailyRevenue {
+        public final String day;
+        public final long amount;
+
+        DailyRevenue(String day, long amount) {
+            this.day = day;
+            this.amount = amount;
+        }
+    }
+
+    public static final class CategorySales {
+        public final String category;
+        public final int quantity;
+
+        CategorySales(String category, int quantity) {
+            this.category = category;
+            this.quantity = quantity;
+        }
+    }
+
+    public static final class ProductSales {
+        public final String name;
+        public final String category;
+        public final int quantity;
+        public final String imageUri;
+
+        ProductSales(String name, String category, int quantity, String imageUri) {
+            this.name = name;
+            this.category = category;
+            this.quantity = quantity;
+            this.imageUri = imageUri;
         }
     }
 
@@ -166,10 +212,11 @@ public class InvoiceDatabase {
                 int plantId = entry.getKey();
                 int quantity = entry.getValue();
                 String plantName;
+                String plantCategory;
                 long unitPrice;
                 int available;
                 try (Cursor cursor = db.rawQuery(
-                        "SELECT name, price, stock FROM plants WHERE id = ? LIMIT 1",
+                        "SELECT name, price, stock, category FROM plants WHERE id = ? LIMIT 1",
                         new String[]{String.valueOf(plantId)})) {
                     if (!cursor.moveToFirst()) {
                         throw new IllegalStateException("Một cây trong hóa đơn không còn tồn tại");
@@ -177,6 +224,7 @@ public class InvoiceDatabase {
                     plantName = cursor.getString(0);
                     unitPrice = Math.round(cursor.getDouble(1));
                     available = cursor.getInt(2);
+                    plantCategory = cursor.getString(3);
                 }
 
                 if (quantity > available) {
@@ -198,6 +246,7 @@ public class InvoiceDatabase {
                 itemValues.put("invoice_id", invoiceId);
                 itemValues.put("plant_id", plantId);
                 itemValues.put("plant_name", plantName);
+                itemValues.put("plant_category", plantCategory);
                 itemValues.put("unit_price", unitPrice);
                 itemValues.put("quantity", quantity);
                 db.insertOrThrow(TABLE_ITEMS, null, itemValues);
@@ -284,19 +333,84 @@ public class InvoiceDatabase {
     }
 
     public Summary getSummary() {
+        return getSummary(Long.MIN_VALUE, Long.MAX_VALUE);
+    }
+
+    public Summary getSummary(long fromInclusive, long toExclusive) {
         String sql = "SELECT COUNT(*), "
                 + "COALESCE(SUM(CASE WHEN status = ? THEN 1 ELSE 0 END), 0), "
                 + "COALESCE(SUM(CASE WHEN status = ? THEN 1 ELSE 0 END), 0), "
-                + "COALESCE(SUM(CASE WHEN status = ? THEN total_amount ELSE 0 END), 0) "
-                + "FROM " + TABLE_INVOICES;
+                + "COALESCE(SUM(CASE WHEN status = ? THEN total_amount ELSE 0 END), 0), "
+                + "COALESCE((SELECT SUM(ii.quantity) FROM " + TABLE_ITEMS
+                + " ii JOIN " + TABLE_INVOICES + " si ON si.id = ii.invoice_id "
+                + "WHERE si.status = ? AND si.created_at >= ? AND si.created_at < ?), 0) "
+                + "FROM " + TABLE_INVOICES + " WHERE created_at >= ? AND created_at < ?";
         try (Cursor cursor = helper.getReadableDatabase().rawQuery(sql,
-                new String[]{STATUS_COMPLETED, STATUS_CANCELLED, STATUS_COMPLETED})) {
+                new String[]{STATUS_COMPLETED, STATUS_CANCELLED, STATUS_COMPLETED,
+                        STATUS_COMPLETED, String.valueOf(fromInclusive),
+                        String.valueOf(toExclusive), String.valueOf(fromInclusive),
+                        String.valueOf(toExclusive)})) {
             if (cursor.moveToFirst()) {
                 return new Summary(cursor.getInt(0), cursor.getInt(1),
-                        cursor.getInt(2), cursor.getLong(3));
+                        cursor.getInt(2), cursor.getLong(3), cursor.getInt(4));
             }
         }
-        return new Summary(0, 0, 0, 0);
+        return new Summary(0, 0, 0, 0, 0);
+    }
+
+    public List<DailyRevenue> getDailyRevenue(long fromInclusive, long toExclusive) {
+        List<DailyRevenue> rows = new ArrayList<>();
+        String sql = "SELECT date(created_at / 1000, 'unixepoch', 'localtime'), "
+                + "SUM(total_amount) FROM " + TABLE_INVOICES
+                + " WHERE status = ? AND created_at >= ? AND created_at < ?"
+                + " GROUP BY date(created_at / 1000, 'unixepoch', 'localtime')"
+                + " ORDER BY 1 ASC";
+        try (Cursor cursor = helper.getReadableDatabase().rawQuery(sql,
+                new String[]{STATUS_COMPLETED, String.valueOf(fromInclusive),
+                        String.valueOf(toExclusive)})) {
+            while (cursor.moveToNext()) {
+                rows.add(new DailyRevenue(cursor.getString(0), cursor.getLong(1)));
+            }
+        }
+        return rows;
+    }
+
+    public List<CategorySales> getCategorySales(long fromInclusive, long toExclusive) {
+        List<CategorySales> rows = new ArrayList<>();
+        String sql = "SELECT ii.plant_category, SUM(ii.quantity) FROM " + TABLE_ITEMS
+                + " ii JOIN " + TABLE_INVOICES + " i ON i.id = ii.invoice_id"
+                + " WHERE i.status = ? AND i.created_at >= ? AND i.created_at < ?"
+                + " GROUP BY ii.plant_category ORDER BY SUM(ii.quantity) DESC";
+        try (Cursor cursor = helper.getReadableDatabase().rawQuery(sql,
+                new String[]{STATUS_COMPLETED, String.valueOf(fromInclusive),
+                        String.valueOf(toExclusive)})) {
+            while (cursor.moveToNext()) {
+                rows.add(new CategorySales(cursor.getString(0), cursor.getInt(1)));
+            }
+        }
+        return rows;
+    }
+
+    public List<ProductSales> getTopSellingPlants(
+            long fromInclusive, long toExclusive, int limit) {
+        List<ProductSales> rows = new ArrayList<>();
+        String sql = "SELECT ii.plant_name, ii.plant_category, SUM(ii.quantity), "
+                + "MAX(COALESCE(p.image_uri, '')) FROM "
+                + TABLE_ITEMS + " ii JOIN " + TABLE_INVOICES
+                + " i ON i.id = ii.invoice_id LEFT JOIN plants p ON p.id = ii.plant_id"
+                + " WHERE i.status = ?"
+                + " AND i.created_at >= ? AND i.created_at < ?"
+                + " GROUP BY ii.plant_name, ii.plant_category"
+                + " ORDER BY SUM(ii.quantity) DESC, ii.plant_name ASC LIMIT ?";
+        try (Cursor cursor = helper.getReadableDatabase().rawQuery(sql,
+                new String[]{STATUS_COMPLETED, String.valueOf(fromInclusive),
+                        String.valueOf(toExclusive), String.valueOf(Math.max(1, limit))})) {
+            while (cursor.moveToNext()) {
+                rows.add(new ProductSales(cursor.getString(0), cursor.getString(1),
+                        cursor.getInt(2), cursor.getString(3)));
+            }
+        }
+        return rows;
     }
 
     /** Cancels one completed invoice and restores stock that still exists. */

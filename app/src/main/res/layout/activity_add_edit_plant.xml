@@ -91,7 +91,7 @@
                         <EditText android:id="@+id/etPrice" android:layout_width="match_parent"
                             android:layout_height="52dp" android:layout_marginTop="7dp"
                             android:background="@drawable/bg_input" android:paddingHorizontal="10dp"
-                            android:inputType="numberDecimal" android:hint="Nhập giá bán..."
+                            android:inputType="number" android:hint="Nhập giá bán..."
                             android:singleLine="true" android:textSize="13sp"
                             android:textColor="@color/text_primary" android:textColorHint="@color/text_secondary" />
                     </LinearLayout>

@@ -23,7 +23,7 @@ public class DBHelper extends SQLiteOpenHelper {
     private static final String DB_NAME = "caycanh.db";
 
     // Tăng phiên bản để cập nhật cấu trúc bảng
-    private static final int DB_VERSION = 4;
+    private static final int DB_VERSION = 5;
 
     // Tên bảng
     private static final String TABLE_USERS = "users";
@@ -155,7 +155,11 @@ public class DBHelper extends SQLiteOpenHelper {
             PlantDatabase.seedData(db, appContext.getPackageName());
         }
         if (oldVersion < 4) {
+            PlantDatabase.migrateLegacySchema(db, appContext.getPackageName());
             InvoiceDatabase.createTables(db);
+        }
+        if (oldVersion == 4) {
+            InvoiceDatabase.migrateToVersion5(db);
         }
     }
 
@@ -228,6 +232,11 @@ public class DBHelper extends SQLiteOpenHelper {
             String password
     ) {
 
+        if (fullName == null || contact == null || password == null
+                || fullName.trim().isEmpty() || password.length() < 8) {
+            return -1;
+        }
+
         String value = normalizeContact(contact);
 
         if (!isValidContact(value)) {
@@ -290,19 +299,30 @@ public class DBHelper extends SQLiteOpenHelper {
         );
 
         SQLiteDatabase db = getWritableDatabase();
-
+        db.beginTransaction();
         try {
-
-            return db.insertOrThrow(
-                    TABLE_USERS,
-                    null,
-                    values
-            );
-
+            // This app has one local administrator. Never expose an open
+            // self-registration path after the first account is created.
+            try (Cursor cursor = db.rawQuery("SELECT COUNT(*) FROM " + TABLE_USERS, null)) {
+                if (cursor.moveToFirst() && cursor.getInt(0) > 0) {
+                    return -1;
+                }
+            }
+            long userId = db.insertOrThrow(TABLE_USERS, null, values);
+            db.setTransactionSuccessful();
+            return userId;
         } catch (SQLiteConstraintException e) {
-
-            // Email hoặc SĐT đã tồn tại
+            // Email or phone number is already registered.
             return -1;
+        } finally {
+            db.endTransaction();
+        }
+    }
+
+    public boolean hasUsers() {
+        try (Cursor cursor = getReadableDatabase().rawQuery(
+                "SELECT 1 FROM " + TABLE_USERS + " LIMIT 1", null)) {
+            return cursor.moveToFirst();
         }
     }
 

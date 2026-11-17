@@ -26,7 +26,49 @@ public class PlantDatabase {
                 + "description TEXT, image_uri TEXT)");
     }
 
+    static void migrateLegacySchema(SQLiteDatabase db, String packageName) {
+        createTable(db);
+        List<String> columns = new ArrayList<>();
+        try (Cursor cursor = db.rawQuery("PRAGMA table_info(" + TABLE_PLANTS + ")", null)) {
+            while (cursor.moveToNext()) columns.add(cursor.getString(1));
+        }
+
+        if (!columns.contains("description")) {
+            db.execSQL("ALTER TABLE " + TABLE_PLANTS + " ADD COLUMN description TEXT");
+        }
+        if (!columns.contains("image_uri")) {
+            db.execSQL("ALTER TABLE " + TABLE_PLANTS + " ADD COLUMN image_uri TEXT");
+            if (columns.contains("image")) {
+                List<long[]> ids = new ArrayList<>();
+                List<String> imageValues = new ArrayList<>();
+                try (Cursor cursor = db.rawQuery(
+                        "SELECT id, image FROM " + TABLE_PLANTS
+                                + " WHERE image IS NOT NULL AND TRIM(image) <> ''", null)) {
+                    while (cursor.moveToNext()) {
+                        ids.add(new long[]{cursor.getLong(0)});
+                        imageValues.add(cursor.getString(1));
+                    }
+                }
+                for (int i = 0; i < ids.size(); i++) {
+                    String value = imageValues.get(i).trim();
+                    if (!value.contains("://")) {
+                        int extension = value.lastIndexOf('.');
+                        if (extension > 0) value = value.substring(0, extension);
+                        value = "android.resource://" + packageName + "/drawable/" + value;
+                    }
+                    ContentValues update = new ContentValues();
+                    update.put("image_uri", value);
+                    db.update(TABLE_PLANTS, update, "id = ?",
+                            new String[]{String.valueOf(ids.get(i)[0])});
+                }
+            }
+        }
+    }
+
     static void seedData(SQLiteDatabase db, String pkg) {
+        try (Cursor cursor = db.rawQuery("SELECT COUNT(*) FROM " + TABLE_PLANTS, null)) {
+            if (cursor.moveToFirst() && cursor.getLong(0) > 0) return;
+        }
         seed(db, "Cây lưỡi hổ", "Cây nội thất", 120000, 35,
                 "Dễ chăm sóc, thích hợp đặt trong nhà.", resourceUri(pkg, "seed_luoi_ho"));
         seed(db, "Cây trầu bà", "Cây để bàn", 90000, 40,
@@ -70,6 +112,17 @@ public class PlantDatabase {
     // READ: tất cả cây theo thứ tự đã thêm.
     public List<Plant> getAllPlants() {
         return searchAndFilterPlants("", "Tất cả", "Mặc định");
+    }
+
+    public List<String> getCategories() {
+        List<String> categories = new ArrayList<>();
+        try (Cursor cursor = helper.getReadableDatabase().rawQuery(
+                "SELECT DISTINCT category FROM " + TABLE_PLANTS
+                        + " WHERE TRIM(category) <> '' ORDER BY category COLLATE NOCASE ASC",
+                null)) {
+            while (cursor.moveToNext()) categories.add(cursor.getString(0));
+        }
+        return categories;
     }
 
     // READ: lấy một cây theo ID để điền lại form sửa.

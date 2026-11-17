@@ -157,19 +157,23 @@ public class PlantManagementActivity extends AppCompatActivity {
         PopupMenu popup = new PopupMenu(this, anchor);
         Menu menu = popup.getMenu();
         menu.add(Menu.NONE, 0, 0, "DANH MỤC").setEnabled(false);
-        menu.add(1, 1, 1, "Cây cảnh hoa");
-        menu.add(1, 2, 2, "Cây khác");
-        menu.add(Menu.NONE, 0, 3, "SẮP XẾP").setEnabled(false);
-        menu.add(2, 3, 4, "Mặc định");
-        menu.add(2, 4, 5, "Giá tăng dần");
-        menu.add(2, 5, 6, "Giá giảm dần");
-        menu.add(2, 6, 7, "Tồn kho tăng dần");
-        menu.add(2, 7, 8, "Tồn kho giảm dần");
+        int categoryId = 100;
+        for (String category : database.getCategories()) {
+            menu.add(1, categoryId++, categoryId, category);
+        }
+        menu.add(Menu.NONE, 0, 1000, "SẮP XẾP").setEnabled(false);
+        menu.add(2, 3, 1001, "Mặc định");
+        menu.add(2, 4, 1002, "Giá tăng dần");
+        menu.add(2, 5, 1003, "Giá giảm dần");
+        menu.add(2, 6, 1004, "Tồn kho tăng dần");
+        menu.add(2, 7, 1005, "Tồn kho giảm dần");
 
         popup.setOnMenuItemClickListener(item -> {
+            if (item.getGroupId() == 1) {
+                selectCategory(item.getTitle().toString());
+                return true;
+            }
             switch (item.getItemId()) {
-                case 1: selectCategory("Cây cảnh hoa"); return true;
-                case 2: selectCategory("Cây khác"); return true;
                 case 3: sortOption = "Mặc định"; break;
                 case 4: sortOption = "Giá tăng dần"; break;
                 case 5: sortOption = "Giá giảm dần"; break;

@@ -136,13 +136,9 @@ public class Account extends AppCompatActivity {
                 startActivity(new Intent(this, PlantManagementActivity.class)));
 
         // Hóa đơn
-        findViewById(R.id.navOrders).setOnClickListener(v -> {
-
-            Toast.makeText(
-                    this,
-                    "Chức năng hóa đơn đang được tích hợp",
-                    Toast.LENGTH_SHORT
-            ).show();
+        findViewById(R.id.navBills).setOnClickListener(v -> {
+            Intent intent = new Intent(this, InvoiceManagementActivity.class);
+            startActivity(intent);
         });
 
         // Chuyển sang trang thống kê đã có sẵn

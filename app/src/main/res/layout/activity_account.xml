@@ -172,7 +172,7 @@
         </LinearLayout>
 
         <LinearLayout
-            android:id="@+id/navOrders"
+            android:id="@+id/navBills"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
@@ -185,13 +185,13 @@
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:src="@drawable/ic_bill"
-                android:contentDescription="Đơn hàng"/>
+                android:contentDescription="Hóa đơn"/>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:text="Đơn hàng"
+                android:text="Hóa đơn"
                 android:textSize="11sp"
                 android:textColor="#555555"/>
         </LinearLayout>

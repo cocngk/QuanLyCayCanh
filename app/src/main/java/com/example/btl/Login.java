@@ -55,6 +55,7 @@ public class Login extends AppCompatActivity {
         btnLogin = findViewById(R.id.btnLogin);
         tvRegister = findViewById(R.id.tvRegister);
         imgEye = findViewById(R.id.imgEye);
+        updateRegistrationAvailability();
 
         // Xử lý đăng nhập
         btnLogin.setOnClickListener(v -> {
@@ -145,6 +146,22 @@ public class Login extends AppCompatActivity {
         });
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        updateRegistrationAvailability();
+    }
+
+    private void updateRegistrationAvailability() {
+        if (tvRegister == null || dbHelper == null) return;
+        if (dbHelper.hasUsers()) {
+            tvRegister.setVisibility(TextView.GONE);
+        } else {
+            tvRegister.setVisibility(TextView.VISIBLE);
+            tvRegister.setText("Khởi tạo tài khoản quản trị");
+        }
+    }
+
     // MỞ TRANG CHỦ SAU ĐĂNG NHẬP
     private void openAccount() {
 
@@ -155,5 +172,11 @@ public class Login extends AppCompatActivity {
 
         startActivity(intent);
         finish();
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (dbHelper != null) dbHelper.close();
+        super.onDestroy();
     }
 }

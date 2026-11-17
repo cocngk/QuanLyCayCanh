@@ -169,9 +169,10 @@
                         android:tint="#22A52E"/>
 
                     <TextView
+                        android:id="@+id/tvPlantCount"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="56"
+                        android:text="0"
                         android:textSize="23sp"
                         android:textStyle="bold"
                         android:textColor="#111111"/>
@@ -202,9 +203,10 @@
                         android:textSize="27sp"/>
 
                     <TextView
+                        android:id="@+id/tvStockCount"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="320"
+                        android:text="0"
                         android:textSize="23sp"
                         android:textStyle="bold"
                         android:textColor="#111111"/>
@@ -235,9 +237,10 @@
                         android:tint="#2196F3"/>
 
                     <TextView
+                        android:id="@+id/tvInvoiceCount"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="27"
+                        android:text="0"
                         android:textSize="23sp"
                         android:textStyle="bold"
                         android:textColor="#111111"/>
@@ -245,7 +248,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Đơn hàng"
+                        android:text="Hóa đơn"
                         android:textSize="12sp"
                         android:textColor="#222222"/>
 
@@ -269,9 +272,10 @@
                         android:textSize="29sp"/>
 
                     <TextView
+                        android:id="@+id/tvRevenue"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="12,45tr"
+                        android:text="0 đ"
                         android:textSize="15sp"
                         android:textStyle="bold"
                         android:textColor="#111111"/>

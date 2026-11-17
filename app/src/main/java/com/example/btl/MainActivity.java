@@ -7,9 +7,14 @@ import android.widget.ImageView;
 import android.widget.EditText;
 import android.view.inputmethod.EditorInfo;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import java.text.NumberFormat;
+import java.util.List;
+import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -19,11 +24,16 @@ public class MainActivity extends AppCompatActivity {
     private LinearLayout btnPlants, btnCreateBill, btnBills;
 
     private ImageView btnNotification, btnAccount, btnMenu;
+    private PlantDatabase plantDatabase;
+    private InvoiceDatabase invoiceDatabase;
+    private final Locale vietnamese = new Locale("vi", "VN");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        plantDatabase = new PlantDatabase(this);
+        invoiceDatabase = new InvoiceDatabase(this);
 
         // ÁNH XẠ CÁC THÀNH PHẦN GIAO DIỆN
         btnStats = findViewById(R.id.btnStats);
@@ -99,6 +109,39 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (plantDatabase != null && invoiceDatabase != null) refreshDashboard();
+    }
+
+    private void refreshDashboard() {
+        List<Plant> plants = plantDatabase.getAllPlants();
+        long stock = 0;
+        for (Plant plant : plants) stock += plant.getStock();
+
+        InvoiceDatabase.Summary summary = invoiceDatabase.getSummary();
+        ((TextView) findViewById(R.id.tvPlantCount)).setText(
+                NumberFormat.getIntegerInstance(vietnamese).format(plants.size()));
+        ((TextView) findViewById(R.id.tvStockCount)).setText(
+                NumberFormat.getIntegerInstance(vietnamese).format(stock));
+        ((TextView) findViewById(R.id.tvInvoiceCount)).setText(
+                NumberFormat.getIntegerInstance(vietnamese).format(summary.totalCount));
+        ((TextView) findViewById(R.id.tvRevenue)).setText(compactMoney(summary.revenue));
+    }
+
+    private String compactMoney(long amount) {
+        if (amount >= 1_000_000) {
+            return NumberFormat.getNumberInstance(vietnamese)
+                    .format(amount / 1_000_000d) + "tr";
+        }
+        if (amount >= 1_000) {
+            return NumberFormat.getNumberInstance(vietnamese)
+                    .format(amount / 1_000d) + "k";
+        }
+        return NumberFormat.getIntegerInstance(vietnamese).format(amount) + " đ";
+    }
+
     // CHUYỂN SANG MÀN HÌNH 3: QUẢN LÝ CÂY CẢNH
     private void openPlants() {
         startActivity(new Intent(this, PlantManagementActivity.class));
@@ -122,5 +165,12 @@ public class MainActivity extends AppCompatActivity {
 
     private void openInvoiceManagement() {
         startActivity(new Intent(this, InvoiceManagementActivity.class));
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (plantDatabase != null) plantDatabase.close();
+        if (invoiceDatabase != null) invoiceDatabase.close();
+        super.onDestroy();
     }
 }

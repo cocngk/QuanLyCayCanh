@@ -181,20 +181,25 @@ public class InvoiceManagementActivity extends AppCompatActivity {
         view.setAllCaps(false);
         view.setTextSize(12);
         view.setIconResource(R.drawable.ic_eye);
+        view.setIconSize(dp(18));
         view.setIconTint(ColorStateList.valueOf(
                 ContextCompat.getColor(this, R.color.green_primary)));
         view.setIconPadding(dp(3));
         view.setCornerRadius(dp(10));
         view.setInsetTop(0);
         view.setInsetBottom(0);
+        view.setInsetLeft(0);
+        view.setInsetRight(0);
         view.setBackgroundTintList(ColorStateList.valueOf(
                 ContextCompat.getColor(this, R.color.white)));
         view.setTextColor(ContextCompat.getColor(this, R.color.green_primary));
+        view.setMaxLines(1);
+        view.setPadding(dp(4), 0, dp(4), 0);
         view.setStrokeColor(ColorStateList.valueOf(
                 ContextCompat.getColor(this, R.color.green_primary)));
         view.setStrokeWidth(dp(1));
         LinearLayout.LayoutParams viewParams = new LinearLayout.LayoutParams(
-                dp(76), dp(38));
+                dp(92), dp(38));
         viewParams.setMargins(dp(8), 0, 0, 0);
         bottom.addView(view, viewParams);
         content.addView(bottom);

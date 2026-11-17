@@ -22,7 +22,9 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedHashSet;
 import java.util.List;
 
 /** Màn hình 4: một Activity dùng chung cho thêm mới và chỉnh sửa cây cảnh. */
@@ -38,9 +40,9 @@ public class AddEditPlantActivity extends AppCompatActivity {
     private String pendingImageUri; // File ảnh mới chọn, chưa lưu vào database.
     private boolean saved = false;
 
-    private final List<String> categories = Arrays.asList(
-            "Chọn loại cây...", "Cây nội thất", "Cây để bàn",
-            "Cây phong thủy", "Cây cảnh hoa", "Cây khác");
+    private final List<String> categories = new ArrayList<>();
+    private static final List<String> DEFAULT_CATEGORIES = Arrays.asList(
+            "Cây nội thất", "Cây để bàn", "Cây phong thủy", "Cây cảnh hoa");
 
     // GetContent được yêu cầu trong đề; ảnh được copy vào thư mục riêng ngay khi chọn.
     private final ActivityResultLauncher<String> imagePicker =
@@ -72,6 +74,11 @@ public class AddEditPlantActivity extends AppCompatActivity {
         imagePlaceholder = findViewById(R.id.imagePlaceholder);
         FrameLayout imagePickerBox = findViewById(R.id.imagePickerBox);
 
+        LinkedHashSet<String> availableCategories = new LinkedHashSet<>();
+        availableCategories.add("Chọn loại cây...");
+        availableCategories.addAll(DEFAULT_CATEGORIES);
+        availableCategories.addAll(database.getCategories());
+        categories.addAll(availableCategories);
         ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(
                 this, android.R.layout.simple_spinner_item, categories);
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -118,9 +125,7 @@ public class AddEditPlantActivity extends AppCompatActivity {
 
     private void fillOldInformation(Plant plant) {
         etName.setText(plant.getName());
-        double price = plant.getPrice();
-        etPrice.setText(price == (long) price
-                ? String.valueOf((long) price) : String.valueOf(price));
+        etPrice.setText(String.valueOf(Math.round(plant.getPrice())));
         etStock.setText(String.valueOf(plant.getStock()));
         etDescription.setText(plant.getDescription() == null ? "" : plant.getDescription());
         int index = categories.indexOf(plant.getCategory());
@@ -164,11 +169,11 @@ public class AddEditPlantActivity extends AppCompatActivity {
             return;
         }
 
-        double price;
+        long price;
         int stock;
         try {
-            price = Double.parseDouble(priceRaw);
-            if (!Double.isFinite(price) || price <= 0) throw new NumberFormatException();
+            price = Long.parseLong(priceRaw.replace(",", "").replace(".", ""));
+            if (price <= 0) throw new NumberFormatException();
         } catch (NumberFormatException e) {
             etPrice.setError("Giá bán phải lớn hơn 0");
             etPrice.requestFocus();

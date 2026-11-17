@@ -19,8 +19,16 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 public class Statistics extends AppCompatActivity {
 
@@ -29,18 +37,36 @@ public class Statistics extends AppCompatActivity {
     private final int LIGHT_GREEN = Color.rgb(232, 248, 228);
     private final int TEXT = Color.rgb(25, 25, 25);
     private final int GRAY = Color.rgb(110, 110, 110);
-
+    private final int[] chartColors = {
+            0xFF00852E, 0xFF54C934, 0xFFFFC800, 0xFF2587DC, 0xFFAA72D6
+    };
     private TextView tvFrom, tvTo;
+    private TextView tvRevenueMetric, tvInvoiceMetric, tvProductsMetric, tvStockMetric;
+    private LinearLayout topPlantsList;
+    private LineChart revenueChart;
+    private DonutChart categoryChart;
+    private BarChart inventoryChart;
+    private InvoiceDatabase invoiceDatabase;
+    private PlantDatabase plantDatabase;
+    private final Locale vietnamese = new Locale("vi", "VN");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        invoiceDatabase = new InvoiceDatabase(this);
+        plantDatabase = new PlantDatabase(this);
 
         getWindow().setStatusBarColor(DARK_GREEN);
         getWindow().setNavigationBarColor(Color.WHITE);
         getWindow().getDecorView().setSystemUiVisibility(0);
 
         createScreen();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (revenueChart != null) refreshStatistics();
     }
 
     private int dp(float value) {
@@ -179,8 +205,13 @@ public class Statistics extends AppCompatActivity {
         LinearLayout dateRow = horizontal();
         dateRow.setPadding(0, dp(16), 0, dp(12));
 
-        tvFrom = text("01/11/2026", 13, TEXT, false);
-        tvTo = text("16/11/2026", 13, TEXT, false);
+        Calendar firstDay = Calendar.getInstance();
+        firstDay.set(Calendar.DAY_OF_MONTH, 1);
+        setStartOfDay(firstDay);
+        Calendar today = Calendar.getInstance();
+        setStartOfDay(today);
+        tvFrom = text(formatDate(firstDay), 13, TEXT, false);
+        tvTo = text(formatDate(today), 13, TEXT, false);
 
         LinearLayout fromBox = dateBox("Từ ngày", tvFrom);
         LinearLayout toBox = dateBox("Đến ngày", tvTo);
@@ -204,11 +235,7 @@ public class Statistics extends AppCompatActivity {
 
         content.addView(btnStatistics, lp(-1, 45));
 
-        btnStatistics.setOnClickListener(v ->
-                Toast.makeText(this,
-                        "Đã cập nhật thống kê theo khoảng ngày",
-                        Toast.LENGTH_SHORT).show()
-        );
+        btnStatistics.setOnClickListener(v -> refreshStatistics());
 
         // =========================================
         // 5. BỐN THẺ SỐ LIỆU
@@ -222,28 +249,28 @@ public class Statistics extends AppCompatActivity {
 
         metrics1.addView(metric(
                         "◉", "Doanh thu",
-                        "7.680.000 đ", LIGHT_GREEN, GREEN),
+                        "0 đ", LIGHT_GREEN, GREEN),
                 new LinearLayout.LayoutParams(0, dp(88), 1));
 
         addSpace(metrics1, 5);
 
         metrics1.addView(metric(
                         "▤", "Số hóa đơn",
-                        "27", 0xFFE5F0FF, 0xFF2584CE),
+                        "0", 0xFFE5F0FF, 0xFF2584CE),
                 new LinearLayout.LayoutParams(0, dp(88), 1));
 
         addSpace(metrics2, 0);
 
         metrics2.addView(metric(
                         "♧", "Sản phẩm bán",
-                        "56", 0xFFFFF5DC, 0xFF269A38),
+                        "0", 0xFFFFF5DC, 0xFF269A38),
                 new LinearLayout.LayoutParams(0, dp(88), 1));
 
         addSpace(metrics2, 5);
 
         metrics2.addView(metric(
                         "⬡", "Tồn kho",
-                        "320", 0xFFF2E5FF, 0xFF9250D8),
+                        "0", 0xFFF2E5FF, 0xFF9250D8),
                 new LinearLayout.LayoutParams(0, dp(88), 1));
 
         content.addView(metrics1);
@@ -258,7 +285,8 @@ public class Statistics extends AppCompatActivity {
         LinearLayout revenueCard = panel(
                 "▥  Doanh thu theo ngày");
 
-        revenueCard.addView(new LineChart(this),
+        revenueChart = new LineChart(this);
+        revenueCard.addView(revenueChart,
                 lp(-1, 175));
 
         chartRow1.addView(revenueCard,
@@ -273,7 +301,8 @@ public class Statistics extends AppCompatActivity {
         LinearLayout categoryCard = panel(
                 "◷  Tỷ lệ loại cây bán");
 
-        categoryCard.addView(new DonutChart(this),
+        categoryChart = new DonutChart(this);
+        categoryCard.addView(categoryChart,
                 lp(-1, 175));
 
         chartRow1.addView(categoryCard,
@@ -291,20 +320,8 @@ public class Statistics extends AppCompatActivity {
         LinearLayout topCard = panel(
                 "♜  Top 5 cây bán chạy");
 
-        addTopPlant(topCard, "luoi_ho",
-                "Cây lưỡi hổ", 12);
-
-        addTopPlant(topCard, "kim_tien",
-                "Cây kim tiền", 10);
-
-        addTopPlant(topCard, "sen",
-                "Cây trầu bà", 8);
-
-        addTopPlant(topCard, "bonsai",
-                "Cẩm tú cầu", 6);
-
-        addTopPlant(topCard, "sen_da",
-                "Cây tùng mini", 5);
+        topPlantsList = vertical();
+        topCard.addView(topPlantsList);
 
         chartRow2.addView(topCard,
                 new LinearLayout.LayoutParams(0, dp(260), 1));
@@ -318,7 +335,8 @@ public class Statistics extends AppCompatActivity {
         LinearLayout stockCard = panel(
                 "⬡  Tồn kho theo loại");
 
-        stockCard.addView(new BarChart(this),
+        inventoryChart = new BarChart(this);
+        stockCard.addView(inventoryChart,
                 lp(-1, 215));
 
         chartRow2.addView(stockCard,
@@ -342,7 +360,7 @@ public class Statistics extends AppCompatActivity {
                 PlantManagementActivity.class);
 
         addNavigation(bottom, "▤", "Hóa đơn", false,
-                null);
+                InvoiceManagementActivity.class);
 
         addNavigation(bottom, "▥", "Thống kê", true,
                 Statistics.class);
@@ -441,6 +459,34 @@ public class Statistics extends AppCompatActivity {
                 true);
 
         number.setGravity(Gravity.CENTER);
+        switch (label) {
+            case "Doanh thu":
+                tvRevenueMetric = number;
+                break;
+            case "Số hóa đơn":
+                tvInvoiceMetric = number;
+                break;
+            case "Sản phẩm bán":
+                tvProductsMetric = number;
+                break;
+            case "Tồn kho":
+                tvStockMetric = number;
+                break;
+        }
+        switch (label) {
+            case "Doanh thu":
+                tvRevenueMetric = number;
+                break;
+            case "Số hóa đơn":
+                tvInvoiceMetric = number;
+                break;
+            case "Sản phẩm bán":
+                tvProductsMetric = number;
+                break;
+            case "Tồn kho":
+                tvStockMetric = number;
+                break;
+        }
 
         card.addView(ic);
         card.addView(name);
@@ -478,24 +524,14 @@ public class Statistics extends AppCompatActivity {
     // HÀM TẠO DANH SÁCH TOP 5
     // =========================================
 
-    private void addTopPlant(
-            LinearLayout parent,
-            String imageName,
-            String name,
-            int quantity) {
+    private void addTopPlant(LinearLayout parent, InvoiceDatabase.ProductSales sale,
+                            int maxQuantity) {
 
         LinearLayout row = horizontal();
         row.setPadding(0, dp(3), 0, dp(3));
 
         ImageView image = new ImageView(this);
-
-        int imageId = getResources().getIdentifier(
-                imageName, "drawable", getPackageName());
-
-        if (imageId != 0) {
-            image.setImageResource(imageId);
-        }
-
+        ImageStorage.display(image, sale.imageUri);
         image.setScaleType(ImageView.ScaleType.CENTER_CROP);
         row.addView(image, lp(35, 35));
 
@@ -505,13 +541,13 @@ public class Statistics extends AppCompatActivity {
         LinearLayout nameRow = horizontal();
 
         TextView plantName = text(
-                name, 11, TEXT, true);
+                sale.name, 11, TEXT, true);
 
         nameRow.addView(plantName,
                 new LinearLayout.LayoutParams(0, dp(20), 1));
 
         TextView number = text(
-                quantity + " cây", 10, TEXT, false);
+                sale.quantity + " cây", 10, TEXT, false);
 
         nameRow.addView(number);
 
@@ -519,16 +555,17 @@ public class Statistics extends AppCompatActivity {
 
         LinearLayout progressBg = new LinearLayout(this);
         progressBg.setBackground(bg(0xFFE5E5E5, 20));
+        progressBg.setWeightSum(1);
 
         View progress = new View(this);
         progress.setBackground(bg(
-                quantity >= 10 ? GREEN : 0xFF65C83D, 20));
+                sale.quantity >= 10 ? GREEN : 0xFF65C83D, 20));
 
         LinearLayout.LayoutParams progressParams =
                 new LinearLayout.LayoutParams(0, dp(6));
 
         progressParams.width = 0;
-        progressParams.weight = quantity / 12f;
+        progressParams.weight = sale.quantity / (float) maxQuantity;
 
         progressBg.addView(progress, progressParams);
 
@@ -538,6 +575,119 @@ public class Statistics extends AppCompatActivity {
                 new LinearLayout.LayoutParams(0, dp(38), 1));
 
         parent.addView(row);
+    }
+
+    private void setStartOfDay(Calendar calendar) {
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+    }
+
+    private String formatDate(Calendar calendar) {
+        return new SimpleDateFormat("dd/MM/yyyy", vietnamese)
+                .format(calendar.getTime());
+    }
+
+    private Calendar parseDate(TextView field) throws java.text.ParseException {
+        SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy", vietnamese);
+        format.setLenient(false);
+        Date parsed = format.parse(field.getText().toString());
+        if (parsed == null) throw new java.text.ParseException("Ngày không hợp lệ", 0);
+        Calendar result = Calendar.getInstance();
+        result.setTime(parsed);
+        setStartOfDay(result);
+        return result;
+    }
+
+    private String formatMoney(long amount) {
+        return NumberFormat.getIntegerInstance(vietnamese).format(amount) + " đ";
+    }
+
+    private void refreshStatistics() {
+        Calendar from;
+        Calendar to;
+        try {
+            from = parseDate(tvFrom);
+            to = parseDate(tvTo);
+        } catch (java.text.ParseException error) {
+            Toast.makeText(this, "Ngày lọc không hợp lệ", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if (from.after(to)) {
+            Toast.makeText(this, "Ngày bắt đầu phải trước hoặc bằng ngày kết thúc",
+                    Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        Calendar toExclusive = (Calendar) to.clone();
+        toExclusive.add(Calendar.DAY_OF_MONTH, 1);
+        long fromMillis = from.getTimeInMillis();
+        long toMillis = toExclusive.getTimeInMillis();
+
+        InvoiceDatabase.Summary summary =
+                invoiceDatabase.getSummary(fromMillis, toMillis);
+        List<Plant> plants = plantDatabase.getAllPlants();
+        long stockCount = 0;
+        Map<String, Integer> stockByCategory = new LinkedHashMap<>();
+        for (Plant plant : plants) {
+            stockCount += plant.getStock();
+            String category = plant.getCategory() == null || plant.getCategory().trim().isEmpty()
+                    ? "Khác" : plant.getCategory().trim();
+            stockByCategory.put(category,
+                    stockByCategory.getOrDefault(category, 0) + plant.getStock());
+        }
+
+        tvRevenueMetric.setText(formatMoney(summary.revenue));
+        tvInvoiceMetric.setText(NumberFormat.getIntegerInstance(vietnamese)
+                .format(summary.completedCount));
+        tvProductsMetric.setText(NumberFormat.getIntegerInstance(vietnamese)
+                .format(summary.productsSold));
+        tvStockMetric.setText(NumberFormat.getIntegerInstance(vietnamese).format(stockCount));
+
+        Map<String, Long> dailyAmounts = new LinkedHashMap<>();
+        for (InvoiceDatabase.DailyRevenue revenue :
+                invoiceDatabase.getDailyRevenue(fromMillis, toMillis)) {
+            dailyAmounts.put(revenue.day, revenue.amount);
+        }
+        updateRevenueChart(dailyAmounts, from, to);
+        categoryChart.setData(invoiceDatabase.getCategorySales(fromMillis, toMillis));
+        updateTopPlants(invoiceDatabase.getTopSellingPlants(fromMillis, toMillis, 5));
+        inventoryChart.setData(stockByCategory);
+    }
+
+    private void updateRevenueChart(Map<String, Long> dailyAmounts,
+                                    Calendar from, Calendar to) {
+        Calendar chartStart = (Calendar) to.clone();
+        chartStart.add(Calendar.DAY_OF_MONTH, -6);
+        if (chartStart.before(from)) chartStart = (Calendar) from.clone();
+
+        List<String> labels = new ArrayList<>();
+        List<Long> amounts = new ArrayList<>();
+        Calendar day = (Calendar) chartStart.clone();
+        SimpleDateFormat sqlDate = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+        SimpleDateFormat axisDate = new SimpleDateFormat("dd/MM", vietnamese);
+        while (!day.after(to)) {
+            labels.add(axisDate.format(day.getTime()));
+            amounts.add(dailyAmounts.getOrDefault(sqlDate.format(day.getTime()), 0L));
+            day.add(Calendar.DAY_OF_MONTH, 1);
+        }
+        revenueChart.setData(labels, amounts);
+    }
+
+    private void updateTopPlants(List<InvoiceDatabase.ProductSales> sales) {
+        topPlantsList.removeAllViews();
+        if (sales.isEmpty()) {
+            TextView empty = text("Chưa có dữ liệu bán hàng trong khoảng ngày này",
+                    12, GRAY, false);
+            empty.setGravity(Gravity.CENTER);
+            topPlantsList.addView(empty, lp(-1, 150));
+            return;
+        }
+        int highest = sales.get(0).quantity;
+        for (InvoiceDatabase.ProductSales sale : sales) {
+            addTopPlant(topPlantsList, sale, highest);
+        }
     }
 
     // =========================================
@@ -600,18 +750,18 @@ public class Statistics extends AppCompatActivity {
     public class LineChart extends View {
 
         Paint p = new Paint(Paint.ANTI_ALIAS_FLAG);
-
-        float[] values = {
-                350, 500, 730, 520, 700, 680, 1020
-        };
-
-        String[] days = {
-                "10/11", "11/11", "12/11",
-                "13/11", "14/11", "15/11", "16/11"
-        };
+        String[] days = new String[0];
+        long[] values = new long[0];
 
         public LineChart(android.content.Context context) {
             super(context);
+        }
+
+        void setData(List<String> labels, List<Long> amounts) {
+            days = labels.toArray(new String[0]);
+            values = new long[amounts.size()];
+            for (int i = 0; i < amounts.size(); i++) values[i] = amounts.get(i);
+            invalidate();
         }
 
         @Override
@@ -626,6 +776,17 @@ public class Statistics extends AppCompatActivity {
             float top = dp(12);
             float bottom = h - dp(28);
 
+            long maxValue = 0;
+            for (long value : values) maxValue = Math.max(maxValue, value);
+            if (values.length == 0 || maxValue == 0) {
+                p.setColor(GRAY);
+                p.setTextSize(dp(12));
+                p.setTextAlign(Paint.Align.CENTER);
+                canvas.drawText("Chưa có doanh thu", w / 2, h / 2, p);
+                return;
+            }
+            float chartMax = maxValue * 1.15f;
+
             p.setStrokeWidth(dp(1));
             p.setColor(0xFFE3E3E3);
 
@@ -638,19 +799,15 @@ public class Statistics extends AppCompatActivity {
                 p.setTextSize(dp(9));
                 p.setColor(TEXT);
                 p.setTextAlign(Paint.Align.RIGHT);
-
-                String[] labels = {
-                        "1200K", "900K", "600K",
-                        "300K", "0"
-                };
-
-                canvas.drawText(labels[i],
+                long axisValue = Math.round(chartMax * (4 - i) / 4f);
+                canvas.drawText(formatAxisValue(axisValue),
                         left - dp(4), y + dp(3), p);
 
                 p.setColor(0xFFE3E3E3);
             }
 
-            float step = (right - left) / 6;
+            float step = values.length > 1
+                    ? (right - left) / (values.length - 1) : 0;
 
             Path line = new Path();
             Path area = new Path();
@@ -659,7 +816,7 @@ public class Statistics extends AppCompatActivity {
 
                 float x = left + step * i;
                 float y = bottom -
-                        (values[i] / 1200f) * (bottom - top);
+                        (values[i] / chartMax) * (bottom - top);
 
                 if (i == 0) {
                     line.moveTo(x, y);
@@ -671,7 +828,7 @@ public class Statistics extends AppCompatActivity {
                 }
             }
 
-            area.lineTo(right, bottom);
+            area.lineTo(left + step * (values.length - 1), bottom);
             area.close();
 
             p.setColor(0x553CBF55);
@@ -688,7 +845,7 @@ public class Statistics extends AppCompatActivity {
 
                 float x = left + step * i;
                 float y = bottom -
-                        (values[i] / 1200f) * (bottom - top);
+                        (values[i] / chartMax) * (bottom - top);
 
                 p.setColor(GREEN);
                 canvas.drawCircle(x, y, dp(4), p);
@@ -704,6 +861,18 @@ public class Statistics extends AppCompatActivity {
                         x, bottom + dp(17), p);
             }
         }
+
+    private String formatAxisValue(long amount) {
+            if (amount >= 1_000_000) {
+                return NumberFormat.getNumberInstance(vietnamese)
+                        .format(amount / 1_000_000f) + "tr";
+            }
+            if (amount >= 1_000) {
+                return NumberFormat.getNumberInstance(vietnamese)
+                        .format(amount / 1_000f) + "k";
+            }
+            return String.valueOf(amount);
+        }
     }
 
     // =========================================
@@ -714,24 +883,32 @@ public class Statistics extends AppCompatActivity {
 
         Paint p = new Paint(Paint.ANTI_ALIAS_FLAG);
 
-        int[] colors = {
-                0xFF00852E,
-                0xFF54C934,
-                0xFFFFC800,
-                0xFF2587DC
-        };
-
-        String[] names = {
-                "Cây nội thất",
-                "Cây để bàn",
-                "Cây phong thủy",
-                "Cây cảnh hoa"
-        };
-
-        int[] values = {37, 25, 20, 18};
+        String[] names = new String[0];
+        int[] values = new int[0];
+        int total = 0;
 
         public DonutChart(android.content.Context context) {
             super(context);
+        }
+
+        void setData(List<InvoiceDatabase.CategorySales> rows) {
+            int count = Math.min(rows.size(), chartColors.length);
+            names = new String[count];
+            values = new int[count];
+            total = 0;
+            for (InvoiceDatabase.CategorySales row : rows) total += row.quantity;
+            for (int i = 0; i < count; i++) {
+                names[i] = rows.get(i).category;
+                values[i] = rows.get(i).quantity;
+            }
+            if (rows.size() > count && count > 0) {
+                names[count - 1] = "Khác";
+                values[count - 1] = 0;
+                for (int i = count - 1; i < rows.size(); i++) {
+                    values[count - 1] += rows.get(i).quantity;
+                }
+            }
+            invalidate();
         }
 
         @Override
@@ -741,8 +918,16 @@ public class Statistics extends AppCompatActivity {
             float cx = getWidth() * 0.30f;
             float cy = getHeight() * 0.48f;
             float radius = Math.min(
-                    getWidth() * 0.23f,
-                    getHeight() * 0.35f);
+                    getWidth() * 0.21f,
+                    getHeight() * 0.32f);
+
+            if (total <= 0 || values.length == 0) {
+                p.setColor(GRAY);
+                p.setTextSize(dp(11));
+                p.setTextAlign(Paint.Align.CENTER);
+                canvas.drawText("Chưa có dữ liệu", getWidth() / 2f, cy, p);
+                return;
+            }
 
             RectF rect = new RectF(
                     cx - radius, cy - radius,
@@ -755,9 +940,9 @@ public class Statistics extends AppCompatActivity {
 
             for (int i = 0; i < values.length; i++) {
 
-                p.setColor(colors[i]);
+                p.setColor(chartColors[i % chartColors.length]);
 
-                float sweep = values[i] * 3.6f;
+                float sweep = values[i] * 360f / total;
 
                 canvas.drawArc(
                         rect, start, sweep,
@@ -772,7 +957,7 @@ public class Statistics extends AppCompatActivity {
             p.setTextSize(dp(19));
             p.setTypeface(Typeface.DEFAULT_BOLD);
 
-            canvas.drawText("56", cx, cy, p);
+            canvas.drawText(String.valueOf(total), cx, cy, p);
 
             p.setTextSize(dp(11));
             p.setTypeface(Typeface.DEFAULT);
@@ -782,33 +967,44 @@ public class Statistics extends AppCompatActivity {
             // Chú thích bên phải
             for (int i = 0; i < names.length; i++) {
 
-                float y = dp(28) + i * dp(32);
+                float y = dp(20) + i * dp(31);
 
-                p.setColor(colors[i]);
+                p.setColor(chartColors[i % chartColors.length]);
 
                 canvas.drawCircle(
-                        getWidth() * 0.59f,
+                        getWidth() * 0.55f,
                         y, dp(5), p);
 
                 p.setColor(TEXT);
                 p.setTextAlign(Paint.Align.LEFT);
                 p.setTextSize(dp(9));
+                p.setTypeface(Typeface.DEFAULT);
+                String categoryName = fitText(names[i], getWidth() * 0.25f);
 
                 canvas.drawText(
-                        names[i],
-                        getWidth() * 0.65f,
+                        categoryName,
+                        getWidth() * 0.62f,
                         y + dp(3), p);
 
                 p.setTextAlign(Paint.Align.RIGHT);
                 p.setTypeface(Typeface.DEFAULT_BOLD);
 
                 canvas.drawText(
-                        values[i] + "%",
+                        Math.round(values[i] * 100f / total) + "%",
                         getWidth() - dp(3),
                         y + dp(3), p);
 
                 p.setTypeface(Typeface.DEFAULT);
             }
+        }
+
+        private String fitText(String value, float maxWidth) {
+            String original = value == null ? "" : value;
+            String result = original;
+            while (!result.isEmpty() && p.measureText(result + "…") > maxWidth) {
+                result = result.substring(0, result.length() - 1);
+            }
+            return result.equals(original) ? result : result + "…";
         }
     }
 
@@ -819,24 +1015,37 @@ public class Statistics extends AppCompatActivity {
     public class BarChart extends View {
 
         Paint p = new Paint(Paint.ANTI_ALIAS_FLAG);
-
-        String[] names = {
-                "Nội thất", "Để bàn",
-                "Phong thủy", "Cây hoa", "Cây khác"
-        };
-
-        int[] values = {120, 80, 60, 40, 20};
-
-        int[] colors = {
-                0xFF00852E,
-                0xFF63C93C,
-                0xFFFFC900,
-                0xFF2689DD,
-                0xFFAAAAAA
-        };
+        String[] names = new String[0];
+        int[] values = new int[0];
+        int maxValue;
 
         public BarChart(android.content.Context context) {
             super(context);
+        }
+
+        void setData(Map<String, Integer> stockByCategory) {
+            List<Map.Entry<String, Integer>> entries =
+                    new ArrayList<>(stockByCategory.entrySet());
+            Collections.sort(entries, (first, second) ->
+                    Integer.compare(second.getValue(), first.getValue()));
+            int count = Math.min(entries.size(), chartColors.length);
+            names = new String[count];
+            values = new int[count];
+            maxValue = 0;
+            for (int i = 0; i < count; i++) {
+                names[i] = entries.get(i).getKey();
+                values[i] = entries.get(i).getValue();
+                maxValue = Math.max(maxValue, values[i]);
+            }
+            if (entries.size() > count && count > 0) {
+                names[count - 1] = "Khác";
+                values[count - 1] = 0;
+                for (int i = count - 1; i < entries.size(); i++) {
+                    values[count - 1] += entries.get(i).getValue();
+                }
+                maxValue = Math.max(maxValue, values[count - 1]);
+            }
+            invalidate();
         }
 
         @Override
@@ -845,6 +1054,13 @@ public class Statistics extends AppCompatActivity {
 
             float w = getWidth();
             float row = dp(37);
+            if (names.length == 0 || maxValue <= 0) {
+                p.setColor(GRAY);
+                p.setTextSize(dp(11));
+                p.setTextAlign(Paint.Align.CENTER);
+                canvas.drawText("Chưa có cây trong kho", w / 2f, getHeight() / 2f, p);
+                return;
+            }
 
             p.setTextSize(dp(10));
             p.setColor(TEXT);
@@ -853,14 +1069,11 @@ public class Statistics extends AppCompatActivity {
             for (int i = 0; i < names.length; i++) {
 
                 float y = dp(23) + i * row;
-
-                canvas.drawText(
-                        names[i],
-                        w * 0.39f,
-                        y + dp(4), p);
+                String label = fitLabel(names[i], w * 0.35f);
+                canvas.drawText(label, w * 0.39f, y + dp(4), p);
 
                 float startX = w * 0.42f;
-                float maxWidth = w * 0.42f;
+                float maxWidth = w * 0.34f;
 
                 p.setColor(0xFFEAEAEA);
                 canvas.drawRoundRect(
@@ -868,10 +1081,9 @@ public class Statistics extends AppCompatActivity {
                         startX + maxWidth, y + dp(7),
                         dp(5), dp(5), p);
 
-                p.setColor(colors[i]);
+                p.setColor(chartColors[i % chartColors.length]);
 
-                float barWidth =
-                        maxWidth * values[i] / 120f;
+                float barWidth = maxWidth * values[i] / maxValue;
 
                 canvas.drawRoundRect(
                         startX, y - dp(8),
@@ -880,11 +1092,10 @@ public class Statistics extends AppCompatActivity {
 
                 p.setColor(TEXT);
                 p.setTextAlign(Paint.Align.LEFT);
-
-                canvas.drawText(
-                        String.valueOf(values[i]),
-                        startX + barWidth + dp(4),
-                        y + dp(4), p);
+                String value = String.valueOf(values[i]);
+                float valueX = Math.min(startX + barWidth + dp(4),
+                        w - p.measureText(value) - dp(2));
+                canvas.drawText(value, valueX, y + dp(4), p);
 
                 p.setTextAlign(Paint.Align.RIGHT);
             }
@@ -895,14 +1106,29 @@ public class Statistics extends AppCompatActivity {
             for (int i = 0; i <= 4; i++) {
 
                 float x = w * 0.42f +
-                        w * 0.42f * i / 4;
+                        w * 0.34f * i / 4;
 
                 p.setTextAlign(Paint.Align.CENTER);
 
                 canvas.drawText(
-                        String.valueOf(i * 30),
+                        String.valueOf(Math.round(maxValue * i / 4f)),
                         x, dp(213), p);
             }
         }
+
+        private String fitLabel(String value, float maxWidth) {
+            String result = value == null ? "" : value;
+            while (!result.isEmpty() && p.measureText(result + "…") > maxWidth) {
+                result = result.substring(0, result.length() - 1);
+            }
+            return result.equals(value) ? result : result + "…";
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (invoiceDatabase != null) invoiceDatabase.close();
+        if (plantDatabase != null) plantDatabase.close();
+        super.onDestroy();
     }
 }

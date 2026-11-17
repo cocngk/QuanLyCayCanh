@@ -12,7 +12,10 @@
         android:theme="@style/Theme.Btl">
 
         <activity android:name=".PlantManagementActivity" android:exported="false" />
-        <activity android:name=".AddEditPlantActivity" android:exported="false" />
+        <activity
+            android:name=".AddEditPlantActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
         <activity android:name=".InvoiceManagementActivity" android:exported="false" />
         <activity
             android:name=".CreateInvoiceActivity"
