@@ -22,6 +22,10 @@ public class Repository {
 
     public static final int NGUONG_TON_THAP = 5;
 
+    private static final String ORDER_WITH_ITEM_COUNT = "SELECT d.*, "
+            + "(SELECT IFNULL(SUM(SoLuong),0) FROM ChiTietDonHang ct "
+            + "WHERE ct.MaDonHang = d.MaDonHang) AS SoSP FROM DonHang d ";
+
     private final DBHelper helper;
 
     public Repository(Context context) {
@@ -268,9 +272,7 @@ public class Repository {
     // ======================================================== Hóa đơn
 
     public List<DonHang> adminOrders(String trangThai, String query) {
-        StringBuilder sql = new StringBuilder("SELECT d.*, "
-                + "(SELECT IFNULL(SUM(SoLuong),0) FROM ChiTietDonHang ct WHERE ct.MaDonHang = d.MaDonHang) AS SoSP "
-                + "FROM DonHang d WHERE 1 = 1");
+        StringBuilder sql = new StringBuilder(ORDER_WITH_ITEM_COUNT + "WHERE 1 = 1");
         List<String> args = new ArrayList<>();
         appendOrderFilters(sql, args, trangThai, query);
         return queryOrders(sql.toString(), args.toArray(new String[0]));
@@ -292,16 +294,13 @@ public class Repository {
     }
 
     public List<DonHang> recentOrders(int limit) {
-        return queryOrders("SELECT d.*, "
-                + "(SELECT IFNULL(SUM(SoLuong),0) FROM ChiTietDonHang ct WHERE ct.MaDonHang = d.MaDonHang) AS SoSP "
-                + "FROM DonHang d ORDER BY d.ThoiGianCapNhat DESC, d.MaDonHang DESC LIMIT " + limit,
+        return queryOrders(ORDER_WITH_ITEM_COUNT
+                        + "ORDER BY d.ThoiGianCapNhat DESC, d.MaDonHang DESC LIMIT " + limit,
                 new String[0]);
     }
 
     public DonHang order(long id) {
-        List<DonHang> list = queryOrders("SELECT d.*, "
-                + "(SELECT IFNULL(SUM(SoLuong),0) FROM ChiTietDonHang ct WHERE ct.MaDonHang = d.MaDonHang) AS SoSP "
-                + "FROM DonHang d WHERE d.MaDonHang = ?",
+        List<DonHang> list = queryOrders(ORDER_WITH_ITEM_COUNT + "WHERE d.MaDonHang = ?",
                 new String[]{String.valueOf(id)});
         return list.isEmpty() ? null : list.get(0);
     }
