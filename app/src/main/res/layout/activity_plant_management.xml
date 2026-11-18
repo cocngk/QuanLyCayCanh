@@ -35,7 +35,7 @@
             android:layout_marginStart="10dp" android:background="@android:color/transparent"
             android:singleLine="true" android:hint="Tìm kiếm cây cảnh..."
             android:textSize="14sp" android:textColor="@color/text_primary"
-            android:textColorHint="@color/text_secondary"
+            android:textColorHint="@color/black"
             android:inputType="textCapSentences" />
     </LinearLayout>
 

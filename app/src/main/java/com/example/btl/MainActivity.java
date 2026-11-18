@@ -8,7 +8,6 @@ import android.widget.EditText;
 import android.view.inputmethod.EditorInfo;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -22,7 +21,7 @@ public class MainActivity extends AppCompatActivity {
     private LinearLayout btnManageAccount;
     private LinearLayout btnPlants, btnCreateBill, btnBills;
 
-    private ImageView btnNotification, btnAccount, btnMenu;
+    private ImageView btnNotification, btnAccount;
     private PlantDatabase plantDatabase;
     private InvoiceDatabase invoiceDatabase;
     private final Locale vietnamese = new Locale("vi", "VN");
@@ -46,7 +45,6 @@ public class MainActivity extends AppCompatActivity {
 
         btnNotification = findViewById(R.id.btnNotification);
         btnAccount = findViewById(R.id.btnAccount);
-        btnMenu = findViewById(R.id.btnMenu);
 
         // MỞ TRANG THỐNG KÊ
         btnStats.setOnClickListener(v -> openStatistics());
@@ -59,15 +57,6 @@ public class MainActivity extends AppCompatActivity {
         btnNotification.setOnClickListener(v -> {
             Intent intent = new Intent(MainActivity.this, Notification.class);
             startActivity(intent);
-        });
-
-        // MENU
-        btnMenu.setOnClickListener(v -> {
-            Toast.makeText(
-                    MainActivity.this,
-                    "Chức năng menu",
-                    Toast.LENGTH_SHORT
-            ).show();
         });
 
         // CÂY CẢNH
