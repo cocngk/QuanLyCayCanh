@@ -117,7 +117,7 @@
                         android:hint="Tìm kiếm cây cảnh..."
                         android:paddingStart="9dp"
                         android:singleLine="true"
-                        android:textSize="14sp"/>
+                        android:textSize="14sp" android:textColor="@color/black" android:textColorHint="@color/input_hint" />
 
                 </LinearLayout>
 

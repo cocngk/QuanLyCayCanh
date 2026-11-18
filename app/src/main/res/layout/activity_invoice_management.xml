@@ -112,8 +112,8 @@
                 android:inputType="text"
                 android:paddingHorizontal="14dp"
                 android:singleLine="true"
-                android:textColor="@color/text_primary"
-                android:textColorHint="@color/black" />
+                android:textColor="@color/black"
+                android:textColorHint="@color/input_hint" />
 
             <HorizontalScrollView
                 android:layout_width="match_parent"

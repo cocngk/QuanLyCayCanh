@@ -47,7 +47,7 @@
             android:drawableTint="#444444"
             android:padding="15dp"
             android:singleLine="true"
-            android:textSize="16sp"/>
+            android:textSize="16sp" android:textColor="@color/black" android:textColorHint="@color/input_hint" />
 
         <!-- EMAIL HOẶC SỐ ĐIỆN THOẠI -->
         <EditText
@@ -63,7 +63,7 @@
             android:drawableTint="#444444"
             android:padding="15dp"
             android:singleLine="true"
-            android:textSize="16sp"/>
+            android:textSize="16sp" android:textColor="@color/black" android:textColorHint="@color/input_hint" />
 
 
         <!-- MẬT KHẨU -->
@@ -93,7 +93,7 @@
                 android:hint="Mật khẩu"
                 android:inputType="textPassword"
                 android:singleLine="true"
-                android:textSize="16sp"/>
+                android:textSize="16sp" android:textColor="@color/black" android:textColorHint="@color/input_hint" />
 
             <ImageView
                 android:id="@+id/imgEye"
@@ -134,7 +134,7 @@
                 android:hint="Xác nhận mật khẩu"
                 android:inputType="textPassword"
                 android:singleLine="true"
-                android:textSize="16sp"/>
+                android:textSize="16sp" android:textColor="@color/black" android:textColorHint="@color/input_hint" />
 
             <ImageView
                 android:id="@+id/imgEyeConfirm"

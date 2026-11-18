@@ -81,8 +81,8 @@
                         android:inputType="textPersonName|textCapWords"
                         android:paddingHorizontal="12dp"
                         android:singleLine="true"
-                        android:textColor="@color/text_primary"
-                        android:textColorHint="@color/black" />
+                        android:textColor="@color/black"
+                        android:textColorHint="@color/input_hint" />
 
                     <EditText
                         android:id="@+id/etCustomerPhone"
@@ -93,8 +93,8 @@
                         android:inputType="phone"
                         android:paddingHorizontal="12dp"
                         android:singleLine="true"
-                        android:textColor="@color/text_primary"
-                        android:textColorHint="@color/black" />
+                        android:textColor="@color/black"
+                        android:textColorHint="@color/input_hint" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
@@ -140,8 +140,8 @@
                             android:inputType="text"
                             android:paddingHorizontal="12dp"
                             android:singleLine="true"
-                            android:textColor="@color/text_primary"
-                            android:textColorHint="@color/black" />
+                            android:textColor="@color/black"
+                            android:textColorHint="@color/input_hint" />
 
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/btnFilterPlants"

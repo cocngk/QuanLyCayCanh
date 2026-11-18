@@ -58,7 +58,7 @@
                     android:background="@drawable/bg_input" android:paddingHorizontal="12dp"
                     android:hint="Nhập tên cây cảnh..." android:singleLine="true"
                     android:inputType="textCapWords" android:textSize="14sp"
-                    android:textColor="@color/text_primary" android:textColorHint="@color/black" />
+                    android:textColor="@color/black" android:textColorHint="@color/input_hint" />
 
                 <TextView android:id="@+id/lblCategory" android:layout_width="wrap_content"
                     android:layout_height="wrap_content" android:layout_marginTop="17dp"
@@ -93,7 +93,7 @@
                             android:background="@drawable/bg_input" android:paddingHorizontal="10dp"
                             android:inputType="number" android:hint="Nhập giá bán..."
                             android:singleLine="true" android:textSize="13sp"
-                            android:textColor="@color/text_primary" android:textColorHint="@color/black" />
+                            android:textColor="@color/black" android:textColorHint="@color/input_hint" />
                     </LinearLayout>
                     <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
                         android:layout_weight="1" android:orientation="vertical"
@@ -108,7 +108,7 @@
                             android:background="@drawable/bg_input" android:paddingHorizontal="10dp"
                             android:inputType="number" android:hint="Nhập số lượng..."
                             android:singleLine="true" android:textSize="13sp"
-                            android:textColor="@color/text_primary" android:textColorHint="@color/black" />
+                            android:textColor="@color/black" android:textColorHint="@color/input_hint" />
                     </LinearLayout>
                 </LinearLayout>
 
@@ -123,7 +123,7 @@
                     android:inputType="textMultiLine|textCapSentences"
                     android:gravity="top" android:minLines="4"
                     android:hint="Nhập mô tả cây cảnh..." android:textSize="14sp"
-                    android:textColor="@color/text_primary" android:textColorHint="@color/black" />
+                    android:textColor="@color/black" android:textColorHint="@color/input_hint" />
 
                 <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
                     android:orientation="horizontal" android:layout_marginTop="20dp">
