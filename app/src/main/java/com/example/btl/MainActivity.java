@@ -18,9 +18,8 @@ import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
 
-    private LinearLayout btnStats, navStats;
-    private LinearLayout btnManageAccount, navAccount;
-    private LinearLayout navHome, navPlants, navBills;
+    private LinearLayout btnStats;
+    private LinearLayout btnManageAccount;
     private LinearLayout btnPlants, btnCreateBill, btnBills;
 
     private ImageView btnNotification, btnAccount, btnMenu;
@@ -39,11 +38,7 @@ public class MainActivity extends AppCompatActivity {
         btnStats = findViewById(R.id.btnStats);
         btnManageAccount = findViewById(R.id.btnManageAccount);
 
-        navHome = findViewById(R.id.navHome);
-        navPlants = findViewById(R.id.navPlants);
-        navBills = findViewById(R.id.navBills);
-        navStats = findViewById(R.id.navStats);
-        navAccount = findViewById(R.id.navAccount);
+        BottomNavHelper.setup(this, R.id.navHome);
 
         btnPlants = findViewById(R.id.btnPlants);
         btnCreateBill = findViewById(R.id.btnCreateBill);
@@ -55,11 +50,9 @@ public class MainActivity extends AppCompatActivity {
 
         // MỞ TRANG THỐNG KÊ
         btnStats.setOnClickListener(v -> openStatistics());
-        navStats.setOnClickListener(v -> openStatistics());
 
         // MỞ TRANG TÀI KHOẢN
         btnManageAccount.setOnClickListener(v -> openAccount());
-        navAccount.setOnClickListener(v -> openAccount());
         btnAccount.setOnClickListener(v -> openAccount());
 
         // THÔNG BÁO
@@ -79,7 +72,6 @@ public class MainActivity extends AppCompatActivity {
 
         // CÂY CẢNH
         btnPlants.setOnClickListener(v -> openPlants());
-        navPlants.setOnClickListener(v -> openPlants());
 
         // Tìm kiếm từ Trang chủ sẽ mở danh sách và điền sẵn từ khóa.
         EditText edtSearch = findViewById(R.id.edtSearch);
@@ -97,16 +89,6 @@ public class MainActivity extends AppCompatActivity {
         // HÓA ĐƠN
         btnCreateBill.setOnClickListener(v -> openCreateInvoice());
         btnBills.setOnClickListener(v -> openInvoiceManagement());
-        navBills.setOnClickListener(v -> openInvoiceManagement());
-
-        // TRANG CHỦ
-        navHome.setOnClickListener(v -> {
-            Toast.makeText(
-                    MainActivity.this,
-                    "Bạn đang ở Trang chủ",
-                    Toast.LENGTH_SHORT
-            ).show();
-        });
     }
 
     @Override

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="76dp"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="72dp"
     android:background="@color/white"
     android:elevation="8dp"
     android:gravity="center_vertical"
@@ -12,68 +12,146 @@
 
     <LinearLayout
         android:id="@+id/navHome"
-        android:layout_width="0dp" android:layout_height="match_parent"
-        android:layout_weight="1" android:orientation="vertical"
-        android:gravity="center" android:clickable="true" android:focusable="true"
-        android:contentDescription="Trang chủ">
-        <ImageView android:layout_width="26dp" android:layout_height="26dp"
-            android:src="@drawable/ic_home" app:tint="@color/text_secondary"
-            android:contentDescription="@null" />
-        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-            android:text="Trang chủ" android:textSize="11sp" android:layout_marginTop="4dp"
-            android:textColor="@color/text_primary" />
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:background="@android:color/transparent"
+        android:clickable="true"
+        android:contentDescription="Trang chủ"
+        android:focusable="true"
+        android:foreground="?attr/selectableItemBackground"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <ImageView
+            android:layout_width="26dp"
+            android:layout_height="26dp"
+            android:contentDescription="@null"
+            android:src="@drawable/ic_home"
+            app:tint="@color/text_secondary" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="Trang chủ"
+            android:textColor="@color/text_primary"
+            android:textSize="11sp" />
     </LinearLayout>
 
     <LinearLayout
         android:id="@+id/navPlants"
-        android:layout_width="0dp" android:layout_height="match_parent"
-        android:layout_weight="1" android:orientation="vertical" android:gravity="center"
-        android:background="@drawable/bg_nav_selected" android:clickable="true" android:focusable="true"
-        android:contentDescription="Cây cảnh đang được chọn">
-        <ImageView android:layout_width="26dp" android:layout_height="26dp"
-            android:src="@drawable/ic_tree" app:tint="@color/green_primary"
-            android:contentDescription="@null" />
-        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-            android:text="Cây cảnh" android:textStyle="bold" android:textSize="11sp"
-            android:layout_marginTop="4dp" android:textColor="@color/green_primary" />
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:background="@android:color/transparent"
+        android:clickable="true"
+        android:contentDescription="Cây cảnh"
+        android:focusable="true"
+        android:foreground="?attr/selectableItemBackground"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <ImageView
+            android:layout_width="26dp"
+            android:layout_height="26dp"
+            android:contentDescription="@null"
+            android:src="@drawable/ic_tree"
+            app:tint="@color/text_secondary" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="Cây cảnh"
+            android:textColor="@color/text_primary"
+            android:textSize="11sp" />
     </LinearLayout>
 
     <LinearLayout
         android:id="@+id/navBills"
-        android:layout_width="0dp" android:layout_height="match_parent"
-        android:layout_weight="1" android:orientation="vertical" android:gravity="center"
-        android:clickable="true" android:focusable="true" android:contentDescription="Hóa đơn">
-        <ImageView android:layout_width="26dp" android:layout_height="26dp"
-            android:src="@drawable/ic_bill" app:tint="@color/text_secondary"
-            android:contentDescription="@null" />
-        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-            android:text="Hóa đơn" android:textSize="11sp" android:layout_marginTop="4dp"
-            android:textColor="@color/text_primary" />
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:background="@android:color/transparent"
+        android:clickable="true"
+        android:contentDescription="Hóa đơn"
+        android:focusable="true"
+        android:foreground="?attr/selectableItemBackground"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <ImageView
+            android:layout_width="26dp"
+            android:layout_height="26dp"
+            android:contentDescription="@null"
+            android:src="@drawable/ic_bill"
+            app:tint="@color/text_secondary" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="Hóa đơn"
+            android:textColor="@color/text_primary"
+            android:textSize="11sp" />
     </LinearLayout>
 
     <LinearLayout
         android:id="@+id/navStats"
-        android:layout_width="0dp" android:layout_height="match_parent"
-        android:layout_weight="1" android:orientation="vertical" android:gravity="center"
-        android:clickable="true" android:focusable="true" android:contentDescription="Thống kê">
-        <ImageView android:layout_width="26dp" android:layout_height="26dp"
-            android:src="@drawable/ic_chart" app:tint="@color/text_secondary"
-            android:contentDescription="@null" />
-        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-            android:text="Thống kê" android:textSize="11sp" android:layout_marginTop="4dp"
-            android:textColor="@color/text_primary" />
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:background="@android:color/transparent"
+        android:clickable="true"
+        android:contentDescription="Thống kê"
+        android:focusable="true"
+        android:foreground="?attr/selectableItemBackground"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <ImageView
+            android:layout_width="26dp"
+            android:layout_height="26dp"
+            android:contentDescription="@null"
+            android:src="@drawable/ic_chart"
+            app:tint="@color/text_secondary" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="Thống kê"
+            android:textColor="@color/text_primary"
+            android:textSize="11sp" />
     </LinearLayout>
 
     <LinearLayout
         android:id="@+id/navAccount"
-        android:layout_width="0dp" android:layout_height="match_parent"
-        android:layout_weight="1" android:orientation="vertical" android:gravity="center"
-        android:clickable="true" android:focusable="true" android:contentDescription="Tài khoản">
-        <ImageView android:layout_width="26dp" android:layout_height="26dp"
-            android:src="@drawable/ic_user" app:tint="@color/text_secondary"
-            android:contentDescription="@null" />
-        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-            android:text="Tài khoản" android:textSize="11sp" android:layout_marginTop="4dp"
-            android:textColor="@color/text_primary" />
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:background="@android:color/transparent"
+        android:clickable="true"
+        android:contentDescription="Tài khoản"
+        android:focusable="true"
+        android:foreground="?attr/selectableItemBackground"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <ImageView
+            android:layout_width="26dp"
+            android:layout_height="26dp"
+            android:contentDescription="@null"
+            android:src="@drawable/ic_user"
+            app:tint="@color/text_secondary" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="Tài khoản"
+            android:textColor="@color/text_primary"
+            android:textSize="11sp" />
     </LinearLayout>
 </LinearLayout>

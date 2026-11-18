@@ -3,37 +3,39 @@ package com.example.btl;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Typeface;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.core.content.ContextCompat;
 
-/** Shared navigation for the plant and invoice screens. */
+/** Shared bottom navigation behavior for the main app screens. */
 public class BottomNavHelper {
     public static void setup(Activity activity) {
         setup(activity, R.id.navPlants);
     }
 
     public static void setup(Activity activity, int selectedTabId) {
-        activity.findViewById(R.id.navHome).setOnClickListener(v ->
-                open(activity, MainActivity.class));
-        activity.findViewById(R.id.navPlants).setOnClickListener(v -> {
-            if (!(activity instanceof PlantManagementActivity)) {
-                open(activity, PlantManagementActivity.class);
-            }
-        });
-        activity.findViewById(R.id.navBills).setOnClickListener(v -> {
-            if (!(activity instanceof InvoiceManagementActivity)) {
-                open(activity, InvoiceManagementActivity.class);
-            }
-        });
-        activity.findViewById(R.id.navStats).setOnClickListener(v ->
-                open(activity, Statistics.class));
-        activity.findViewById(R.id.navAccount).setOnClickListener(v ->
-                open(activity, Account.class));
+        setTabClick(activity, R.id.navHome, MainActivity.class);
+        setTabClick(activity, R.id.navPlants, PlantManagementActivity.class);
+        setTabClick(activity, R.id.navBills, InvoiceManagementActivity.class);
+        setTabClick(activity, R.id.navStats, Statistics.class);
+        setTabClick(activity, R.id.navAccount, Account.class);
 
         selectTab(activity, selectedTabId);
+    }
+
+    private static void setTabClick(
+            Activity activity, int tabId, Class<?> destination) {
+        View tab = activity.findViewById(tabId);
+        if (tab == null) return;
+
+        tab.setOnClickListener(v -> {
+            if (!destination.isInstance(activity)) {
+                open(activity, destination);
+            }
+        });
     }
 
     private static void selectTab(Activity activity, int selectedTabId) {
@@ -46,6 +48,7 @@ public class BottomNavHelper {
             LinearLayout tab = activity.findViewById(tabId);
             if (tab == null) continue;
             boolean selected = tabId == selectedTabId;
+            tab.setSelected(selected);
             tab.setBackgroundResource(selected
                     ? R.drawable.bg_nav_selected : android.R.color.transparent);
             for (int i = 0; i < tab.getChildCount(); i++) {

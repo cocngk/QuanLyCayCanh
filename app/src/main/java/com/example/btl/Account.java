@@ -120,36 +120,7 @@ public class Account extends AppCompatActivity {
                     showLogoutDialog();
                 });
 
-        // =====================================
-        // THANH ĐIỀU HƯỚNG PHÍA DƯỚI
-        // =====================================
-
-        // Trở về trang chủ
-        findViewById(R.id.navHome).setOnClickListener(v -> {
-            Intent intent = new Intent(this, MainActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-            startActivity(intent);
-        });
-
-        // Mở màn hình quản lý cây cảnh
-        findViewById(R.id.navPlants).setOnClickListener(v ->
-                startActivity(new Intent(this, PlantManagementActivity.class)));
-
-        // Hóa đơn
-        findViewById(R.id.navBills).setOnClickListener(v -> {
-            Intent intent = new Intent(this, InvoiceManagementActivity.class);
-            startActivity(intent);
-        });
-
-        // Chuyển sang trang thống kê đã có sẵn
-        findViewById(R.id.navStats).setOnClickListener(v ->
-                startActivity(new Intent(this, Statistics.class)));
-
-        // Đang ở trang Tài khoản
-        findViewById(R.id.navAccount).setOnClickListener(v -> {
-
-            // Không cần chuyển màn hình
-        });
+        BottomNavHelper.setup(this, R.id.navAccount);
     }
 
     // =====================================

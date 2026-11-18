@@ -10,6 +10,7 @@ import android.graphics.Path;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -344,33 +345,11 @@ public class Statistics extends AppCompatActivity {
 
         content.addView(chartRow2);
 
-        // =========================================
-        // 10. THANH ĐIỀU HƯỚNG DƯỚI CÙNG
-        // =========================================
-
-        LinearLayout bottom = horizontal();
-        bottom.setGravity(Gravity.CENTER);
-        bottom.setPadding(dp(5), dp(5), dp(5), dp(5));
-        bottom.setBackgroundColor(Color.WHITE);
-
-        addNavigation(bottom, "⌂", "Trang chủ", false,
-                MainActivity.class);
-
-        addNavigation(bottom, "♧", "Cây cảnh", false,
-                PlantManagementActivity.class);
-
-        addNavigation(bottom, "▤", "Hóa đơn", false,
-                InvoiceManagementActivity.class);
-
-        addNavigation(bottom, "▥", "Thống kê", true,
-                Statistics.class);
-
-        addNavigation(bottom, "♙", "Tài khoản", false,
-                Account.class);
-
-        root.addView(bottom, lp(-1, 65));
-
+        View bottomNavigation = LayoutInflater.from(this)
+                .inflate(R.layout.view_bottom_nav, root, false);
+        root.addView(bottomNavigation);
         setContentView(root);
+        BottomNavHelper.setup(this, R.id.navStats);
     }
 
     // =========================================
@@ -687,59 +666,6 @@ public class Statistics extends AppCompatActivity {
         int highest = sales.get(0).quantity;
         for (InvoiceDatabase.ProductSales sale : sales) {
             addTopPlant(topPlantsList, sale, highest);
-        }
-    }
-
-    // =========================================
-    // THANH ĐIỀU HƯỚNG
-    // =========================================
-
-    private void addNavigation(
-            LinearLayout parent,
-            String icon,
-            String label,
-            boolean selected,
-            Class<?> destination) {
-
-        LinearLayout item = vertical();
-        item.setGravity(Gravity.CENTER);
-        item.setPadding(dp(2), dp(4), dp(2), dp(4));
-
-        if (selected) {
-            item.setBackground(bg(LIGHT_GREEN, 12));
-        }
-
-        TextView ic = text(
-                icon, 25,
-                selected ? GREEN : 0xFF555555,
-                selected);
-
-        ic.setGravity(Gravity.CENTER);
-
-        TextView name = text(
-                label, 10,
-                selected ? GREEN : TEXT,
-                selected);
-
-        name.setGravity(Gravity.CENTER);
-
-        item.addView(ic);
-        item.addView(name);
-
-        parent.addView(item,
-                new LinearLayout.LayoutParams(0, dp(58), 1));
-
-        if (destination != null &&
-                destination != Statistics.class) {
-
-            item.setOnClickListener(v -> {
-
-                android.content.Intent intent =
-                        new android.content.Intent(
-                                Statistics.this, destination);
-
-                startActivity(intent);
-            });
         }
     }
 
