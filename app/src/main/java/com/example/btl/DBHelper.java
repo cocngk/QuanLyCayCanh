@@ -21,9 +21,11 @@ public class DBHelper extends SQLiteOpenHelper {
 
     // Tên cơ sở dữ liệu
     private static final String DB_NAME = "caycanh.db";
+    private static final String DEFAULT_ADMIN_EMAIL = "admin@gmail.com";
+    private static final String DEFAULT_ADMIN_PASSWORD = "admin12345";
 
     // Tăng phiên bản để cập nhật cấu trúc bảng
-    private static final int DB_VERSION = 5;
+    private static final int DB_VERSION = 6;
 
     // Tên bảng
     private static final String TABLE_USERS = "users";
@@ -76,6 +78,7 @@ public class DBHelper extends SQLiteOpenHelper {
         PlantDatabase.createTable(db);
         PlantDatabase.seedData(db, appContext.getPackageName());
         InvoiceDatabase.createTables(db);
+        seedDefaultAdminIfNeeded(db);
     }
 
     @Override
@@ -161,6 +164,30 @@ public class DBHelper extends SQLiteOpenHelper {
         if (oldVersion == 4) {
             InvoiceDatabase.migrateToVersion5(db);
         }
+        if (oldVersion < 6) {
+            seedDefaultAdminIfNeeded(db);
+        }
+    }
+
+    private void seedDefaultAdminIfNeeded(SQLiteDatabase db) {
+        try (Cursor cursor = db.rawQuery(
+                "SELECT 1 FROM " + TABLE_USERS + " LIMIT 1", null)) {
+            if (cursor.moveToFirst()) return;
+        }
+
+        byte[] salt = new byte[16];
+        new SecureRandom().nextBytes(salt);
+        byte[] hash = deriveHash(DEFAULT_ADMIN_PASSWORD, salt);
+
+        ContentValues values = new ContentValues();
+        values.put("full_name", "Admin");
+        values.put("email", DEFAULT_ADMIN_EMAIL);
+        values.putNull("phone");
+        values.put("salt", Base64.encodeToString(salt, Base64.NO_WRAP));
+        values.put("password_hash", Base64.encodeToString(hash, Base64.NO_WRAP));
+
+        db.insertWithOnConflict(
+                TABLE_USERS, null, values, SQLiteDatabase.CONFLICT_IGNORE);
     }
 
     // ======================================
