@@ -171,7 +171,8 @@ public class DBHelper extends SQLiteOpenHelper {
 
     private void seedDefaultAdminIfNeeded(SQLiteDatabase db) {
         try (Cursor cursor = db.rawQuery(
-                "SELECT 1 FROM " + TABLE_USERS + " LIMIT 1", null)) {
+                "SELECT 1 FROM " + TABLE_USERS + " WHERE email = ? LIMIT 1",
+                new String[]{DEFAULT_ADMIN_EMAIL})) {
             if (cursor.moveToFirst()) return;
         }
 
