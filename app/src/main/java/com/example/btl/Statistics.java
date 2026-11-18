@@ -1,20 +1,20 @@
 package com.example.btl;
 
 import android.app.DatePickerDialog;
+import android.content.res.ColorStateList;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
-import android.graphics.Typeface;
 import android.graphics.Path;
-import android.graphics.drawable.GradientDrawable;
+import android.graphics.Typeface;
 import android.os.Bundle;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ScrollView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -35,7 +35,6 @@ public class Statistics extends AppCompatActivity {
 
     private final int GREEN = Color.rgb(0, 115, 43);
     private final int DARK_GREEN = Color.rgb(0, 75, 29);
-    private final int LIGHT_GREEN = Color.rgb(232, 248, 228);
     private final int TEXT = Color.rgb(25, 25, 25);
     private final int GRAY = Color.rgb(110, 110, 110);
     private final int[] chartColors = {
@@ -43,7 +42,9 @@ public class Statistics extends AppCompatActivity {
     };
     private TextView tvFrom, tvTo;
     private TextView tvRevenueMetric, tvInvoiceMetric, tvProductsMetric, tvStockMetric;
+    private TextView tvTopPlantsEmpty;
     private LinearLayout topPlantsList;
+    private FrameLayout chartRevenueContainer, chartCategoryContainer, chartInventoryContainer;
     private LineChart revenueChart;
     private DonutChart categoryChart;
     private BarChart inventoryChart;
@@ -61,7 +62,8 @@ public class Statistics extends AppCompatActivity {
         getWindow().setNavigationBarColor(Color.WHITE);
         getWindow().getDecorView().setSystemUiVisibility(0);
 
-        createScreen();
+        setContentView(R.layout.activity_statistics);
+        bindScreen();
     }
 
     @Override
@@ -75,319 +77,51 @@ public class Statistics extends AppCompatActivity {
                 .getDisplayMetrics().density + 0.5f);
     }
 
-    private GradientDrawable bg(int color, int radius) {
-        GradientDrawable drawable = new GradientDrawable();
-        drawable.setColor(color);
-        drawable.setCornerRadius(dp(radius));
-        return drawable;
-    }
+    private void bindScreen() {
+        tvFrom = findViewById(R.id.tvFrom);
+        tvTo = findViewById(R.id.tvTo);
+        tvRevenueMetric = findViewById(R.id.tvRevenueMetric);
+        tvInvoiceMetric = findViewById(R.id.tvInvoiceMetric);
+        tvProductsMetric = findViewById(R.id.tvProductsMetric);
+        tvStockMetric = findViewById(R.id.tvStockMetric);
+        tvTopPlantsEmpty = findViewById(R.id.tvTopPlantsEmpty);
+        topPlantsList = findViewById(R.id.topPlantsList);
+        chartRevenueContainer = findViewById(R.id.chartRevenueContainer);
+        chartCategoryContainer = findViewById(R.id.chartCategoryContainer);
+        chartInventoryContainer = findViewById(R.id.chartInventoryContainer);
 
-    private TextView text(String value, int size,
-                          int color, boolean bold) {
-
-        TextView tv = new TextView(this);
-        tv.setText(value);
-        tv.setTextSize(size);
-        tv.setTextColor(color);
-        tv.setGravity(Gravity.CENTER_VERTICAL);
-
-        if (bold) {
-            tv.setTypeface(null, Typeface.BOLD);
-        }
-
-        return tv;
-    }
-
-    private LinearLayout horizontal() {
-        LinearLayout row = new LinearLayout(this);
-        row.setOrientation(LinearLayout.HORIZONTAL);
-        row.setGravity(Gravity.CENTER_VERTICAL);
-        return row;
-    }
-
-    private LinearLayout vertical() {
-        LinearLayout column = new LinearLayout(this);
-        column.setOrientation(LinearLayout.VERTICAL);
-        return column;
-    }
-
-    private LinearLayout.LayoutParams lp(
-            int width, int height) {
-
-        return new LinearLayout.LayoutParams(
-                width < 0 ? width : dp(width),
-                height < 0 ? height : dp(height)
-        );
-    }
-
-    private void createScreen() {
-
-        LinearLayout root = vertical();
-        root.setBackgroundColor(Color.WHITE);
-
-        // =========================================
-        // 1. THANH TIÊU ĐỀ
-        // =========================================
-
-        LinearLayout header = horizontal();
-        header.setPadding(dp(18), 0, dp(18), 0);
-        header.setBackgroundColor(GREEN);
-
-        TextView menu = text("☰", 30, Color.WHITE, false);
-        header.addView(menu, lp(48, 55));
-
-        TextView title = text(
-                "Thống kê", 25, Color.WHITE, true);
-
-        header.addView(title,
-                new LinearLayout.LayoutParams(
-                        0, dp(55), 1));
-
-        root.addView(header, lp(-1, 55));
-
-        // =========================================
-        // 2. KHU VỰC CÓ THỂ CUỘN
-        // =========================================
-
-        ScrollView scroll = new ScrollView(this);
-        scroll.setFillViewport(false);
-
-        LinearLayout content = vertical();
-        content.setPadding(dp(12), dp(10), dp(12), dp(12));
-
-        scroll.addView(content);
-
-        root.addView(scroll,
-                new LinearLayout.LayoutParams(
-                        -1, 0, 1));
-
-        // =========================================
-        // 3. BANNER THỐNG KÊ KINH DOANH
-        // =========================================
-
-        LinearLayout banner = horizontal();
-        banner.setPadding(dp(12), dp(8), dp(8), dp(8));
-        banner.setBackground(bg(LIGHT_GREEN, 18));
-
-        TextView bannerIcon = text(
-                "▥", 49, GREEN, true);
-
-        banner.addView(bannerIcon, lp(65, 105));
-
-        LinearLayout bannerText = vertical();
-
-        TextView bannerTitle = text(
-                "Thống kê kinh doanh",
-                20, DARK_GREEN, true);
-
-        TextView bannerSub = text(
-                "Doanh thu, hóa đơn, sản phẩm và tồn kho",
-                13, TEXT, false);
-
-        bannerText.addView(bannerTitle);
-        bannerText.addView(bannerSub);
-
-        banner.addView(bannerText,
-                new LinearLayout.LayoutParams(
-                        0, -2, 1));
-
-        ImageView plant = new ImageView(this);
-        plant.setImageResource(R.drawable.kim_tien);
-        plant.setScaleType(ImageView.ScaleType.CENTER_CROP);
-
-        banner.addView(plant, lp(80, 90));
-
-        content.addView(banner, lp(-1, 105));
-
-        // =========================================
-        // 4. BỘ LỌC NGÀY
-        // =========================================
-
-        LinearLayout dateRow = horizontal();
-        dateRow.setPadding(0, dp(16), 0, dp(12));
+        revenueChart = new LineChart(this);
+        categoryChart = new DonutChart(this);
+        inventoryChart = new BarChart(this);
+        chartRevenueContainer.addView(revenueChart,
+                new FrameLayout.LayoutParams(
+                        FrameLayout.LayoutParams.MATCH_PARENT,
+                        FrameLayout.LayoutParams.MATCH_PARENT));
+        chartCategoryContainer.addView(categoryChart,
+                new FrameLayout.LayoutParams(
+                        FrameLayout.LayoutParams.MATCH_PARENT,
+                        FrameLayout.LayoutParams.MATCH_PARENT));
+        chartInventoryContainer.addView(inventoryChart,
+                new FrameLayout.LayoutParams(
+                        FrameLayout.LayoutParams.MATCH_PARENT,
+                        FrameLayout.LayoutParams.MATCH_PARENT));
 
         Calendar firstDay = Calendar.getInstance();
         firstDay.set(Calendar.DAY_OF_MONTH, 1);
         setStartOfDay(firstDay);
         Calendar today = Calendar.getInstance();
         setStartOfDay(today);
-        tvFrom = text(formatDate(firstDay), 13, TEXT, false);
-        tvTo = text(formatDate(today), 13, TEXT, false);
+        tvFrom.setText(formatDate(firstDay));
+        tvTo.setText(formatDate(today));
 
-        LinearLayout fromBox = dateBox("Từ ngày", tvFrom);
-        LinearLayout toBox = dateBox("Đến ngày", tvTo);
+        findViewById(R.id.boxFromDate).setOnClickListener(
+                v -> showDatePicker(tvFrom));
+        findViewById(R.id.boxToDate).setOnClickListener(
+                v -> showDatePicker(tvTo));
+        findViewById(R.id.btnStatistics).setOnClickListener(
+                v -> refreshStatistics());
 
-        dateRow.addView(fromBox,
-                new LinearLayout.LayoutParams(0, dp(55), 1));
-
-        View space = new View(this);
-        dateRow.addView(space, lp(7, 1));
-
-        dateRow.addView(toBox,
-                new LinearLayout.LayoutParams(0, dp(55), 1));
-
-        content.addView(dateRow);
-
-        TextView btnStatistics = text(
-                "⌕  Thống kê", 15, Color.WHITE, true);
-
-        btnStatistics.setGravity(Gravity.CENTER);
-        btnStatistics.setBackground(bg(GREEN, 12));
-
-        content.addView(btnStatistics, lp(-1, 45));
-
-        btnStatistics.setOnClickListener(v -> refreshStatistics());
-
-        // =========================================
-        // 5. BỐN THẺ SỐ LIỆU
-        // =========================================
-
-        LinearLayout metrics1 = horizontal();
-        LinearLayout metrics2 = horizontal();
-
-        metrics1.setPadding(0, dp(12), 0, 0);
-        metrics2.setPadding(0, dp(8), 0, dp(12));
-
-        metrics1.addView(metric(
-                        "◉", "Doanh thu",
-                        "0 đ", LIGHT_GREEN, GREEN),
-                new LinearLayout.LayoutParams(0, dp(88), 1));
-
-        addSpace(metrics1, 5);
-
-        metrics1.addView(metric(
-                        "▤", "Số hóa đơn",
-                        "0", 0xFFE5F0FF, 0xFF2584CE),
-                new LinearLayout.LayoutParams(0, dp(88), 1));
-
-        addSpace(metrics2, 0);
-
-        metrics2.addView(metric(
-                        "♧", "Sản phẩm bán",
-                        "0", 0xFFFFF5DC, 0xFF269A38),
-                new LinearLayout.LayoutParams(0, dp(88), 1));
-
-        addSpace(metrics2, 5);
-
-        metrics2.addView(metric(
-                        "⬡", "Tồn kho",
-                        "0", 0xFFF2E5FF, 0xFF9250D8),
-                new LinearLayout.LayoutParams(0, dp(88), 1));
-
-        content.addView(metrics1);
-        content.addView(metrics2);
-
-        // =========================================
-        // 6. BIỂU ĐỒ DOANH THU
-        // =========================================
-
-        LinearLayout chartRow1 = horizontal();
-
-        LinearLayout revenueCard = panel(
-                "▥  Doanh thu theo ngày");
-
-        revenueChart = new LineChart(this);
-        revenueCard.addView(revenueChart,
-                lp(-1, 175));
-
-        chartRow1.addView(revenueCard,
-                new LinearLayout.LayoutParams(0, dp(255), 1));
-
-        addSpace(chartRow1, 8);
-
-        // =========================================
-        // 7. BIỂU ĐỒ TỶ LỆ LOẠI CÂY
-        // =========================================
-
-        LinearLayout categoryCard = panel(
-                "◷  Tỷ lệ loại cây bán");
-
-        categoryChart = new DonutChart(this);
-        categoryCard.addView(categoryChart,
-                lp(-1, 175));
-
-        chartRow1.addView(categoryCard,
-                new LinearLayout.LayoutParams(0, dp(255), 1));
-
-        content.addView(chartRow1);
-
-        // =========================================
-        // 8. TOP 5 CÂY BÁN CHẠY
-        // =========================================
-
-        LinearLayout chartRow2 = horizontal();
-        chartRow2.setPadding(0, dp(10), 0, 0);
-
-        LinearLayout topCard = panel(
-                "♜  Top 5 cây bán chạy");
-
-        topPlantsList = vertical();
-        topCard.addView(topPlantsList);
-
-        chartRow2.addView(topCard,
-                new LinearLayout.LayoutParams(0, dp(260), 1));
-
-        addSpace(chartRow2, 8);
-
-        // =========================================
-        // 9. BIỂU ĐỒ TỒN KHO
-        // =========================================
-
-        LinearLayout stockCard = panel(
-                "⬡  Tồn kho theo loại");
-
-        inventoryChart = new BarChart(this);
-        stockCard.addView(inventoryChart,
-                lp(-1, 215));
-
-        chartRow2.addView(stockCard,
-                new LinearLayout.LayoutParams(0, dp(260), 1));
-
-        content.addView(chartRow2);
-
-        View bottomNavigation = LayoutInflater.from(this)
-                .inflate(R.layout.view_bottom_nav, root, false);
-        root.addView(bottomNavigation);
-        setContentView(root);
         BottomNavHelper.setup(this, R.id.navStats);
-    }
-
-    // =========================================
-    // HÀM TẠO Ô CHỌN NGÀY
-    // =========================================
-
-    private LinearLayout dateBox(
-            String label, TextView date) {
-
-        LinearLayout box = vertical();
-        box.setPadding(dp(7), dp(3), dp(5), dp(3));
-        box.setBackground(bg(Color.WHITE, 10));
-
-        box.setBackground(borderBackground());
-
-        TextView title = text(label, 12, GRAY, false);
-
-        box.addView(title);
-
-        LinearLayout row = horizontal();
-
-        TextView calendar = text("▦", 19, GRAY, true);
-
-        row.addView(calendar, lp(25, 28));
-        row.addView(date,
-                new LinearLayout.LayoutParams(0, dp(28), 1));
-
-        box.addView(row);
-
-        box.setOnClickListener(v -> showDatePicker(date));
-
-        return box;
-    }
-
-    private GradientDrawable borderBackground() {
-        GradientDrawable d = bg(Color.WHITE, 10);
-        d.setStroke(dp(1), 0xFFDADADA);
-        return d;
     }
 
     private void showDatePicker(TextView target) {
@@ -413,146 +147,20 @@ public class Statistics extends AppCompatActivity {
         dialog.show();
     }
 
-    // =========================================
-    // HÀM TẠO THẺ SỐ LIỆU
-    // =========================================
-
-    private LinearLayout metric(
-            String icon, String label, String value,
-            int background, int iconColor) {
-
-        LinearLayout card = vertical();
-        card.setGravity(Gravity.CENTER);
-        card.setPadding(dp(3), dp(5), dp(3), dp(5));
-        card.setBackground(bg(background, 15));
-
-        TextView ic = text(icon, 26, iconColor, true);
-        ic.setGravity(Gravity.CENTER);
-
-        TextView name = text(label, 12, TEXT, false);
-        name.setGravity(Gravity.CENTER);
-
-        TextView number = text(value, 16,
-                label.equals("Doanh thu") ||
-                        label.equals("Số hóa đơn") ? GREEN : TEXT,
-                true);
-
-        number.setGravity(Gravity.CENTER);
-        switch (label) {
-            case "Doanh thu":
-                tvRevenueMetric = number;
-                break;
-            case "Số hóa đơn":
-                tvInvoiceMetric = number;
-                break;
-            case "Sản phẩm bán":
-                tvProductsMetric = number;
-                break;
-            case "Tồn kho":
-                tvStockMetric = number;
-                break;
-        }
-        switch (label) {
-            case "Doanh thu":
-                tvRevenueMetric = number;
-                break;
-            case "Số hóa đơn":
-                tvInvoiceMetric = number;
-                break;
-            case "Sản phẩm bán":
-                tvProductsMetric = number;
-                break;
-            case "Tồn kho":
-                tvStockMetric = number;
-                break;
-        }
-
-        card.addView(ic);
-        card.addView(name);
-        card.addView(number);
-
-        return card;
-    }
-
-    private void addSpace(LinearLayout row, int width) {
-        View space = new View(this);
-        row.addView(space, lp(width, 1));
-    }
-
-    // =========================================
-    // HÀM TẠO KHUNG BIỂU ĐỒ
-    // =========================================
-
-    private LinearLayout panel(String title) {
-
-        LinearLayout card = vertical();
-        card.setPadding(dp(8), dp(8), dp(8), dp(6));
-        card.setBackground(bg(Color.WHITE, 16));
-
-        card.setElevation(dp(2));
-
-        TextView heading = text(
-                title, 14, DARK_GREEN, true);
-
-        card.addView(heading, lp(-1, 32));
-
-        return card;
-    }
-
-    // =========================================
-    // HÀM TẠO DANH SÁCH TOP 5
-    // =========================================
-
     private void addTopPlant(LinearLayout parent, InvoiceDatabase.ProductSales sale,
                             int maxQuantity) {
-
-        LinearLayout row = horizontal();
-        row.setPadding(0, dp(3), 0, dp(3));
-
-        ImageView image = new ImageView(this);
+        View row = LayoutInflater.from(this)
+                .inflate(R.layout.item_statistics_top_plant, parent, false);
+        ImageView image = row.findViewById(R.id.imgTopPlant);
         ImageStorage.display(image, sale.imageUri);
-        image.setScaleType(ImageView.ScaleType.CENTER_CROP);
-        row.addView(image, lp(35, 35));
-
-        LinearLayout info = vertical();
-        info.setPadding(dp(5), 0, 0, 0);
-
-        LinearLayout nameRow = horizontal();
-
-        TextView plantName = text(
-                sale.name, 11, TEXT, true);
-
-        nameRow.addView(plantName,
-                new LinearLayout.LayoutParams(0, dp(20), 1));
-
-        TextView number = text(
-                sale.quantity + " cây", 10, TEXT, false);
-
-        nameRow.addView(number);
-
-        info.addView(nameRow);
-
-        LinearLayout progressBg = new LinearLayout(this);
-        progressBg.setBackground(bg(0xFFE5E5E5, 20));
-        progressBg.setWeightSum(1);
-
-        View progress = new View(this);
-        progress.setBackground(bg(
-                sale.quantity >= 10 ? GREEN : 0xFF65C83D, 20));
-
-        LinearLayout.LayoutParams progressParams =
-                new LinearLayout.LayoutParams(0, dp(6));
-
-        progressParams.width = 0;
-        progressParams.weight = sale.quantity / (float) maxQuantity;
-
-        progressBg.addView(progress, progressParams);
-
-        info.addView(progressBg, lp(-1, 6));
-
-        row.addView(info,
-                new LinearLayout.LayoutParams(0, dp(38), 1));
-
+        ((TextView) row.findViewById(R.id.tvTopPlantName)).setText(sale.name);
+        ((TextView) row.findViewById(R.id.tvTopPlantQuantity))
+                .setText(sale.quantity + " cây");
+        ProgressBar progress = row.findViewById(R.id.progressTopPlant);
+        progress.setProgress(maxQuantity > 0
+                ? Math.round(sale.quantity * 100f / maxQuantity) : 0);
+        progress.setProgressTintList(ColorStateList.valueOf(
+                sale.quantity >= 10 ? GREEN : 0xFF65C83D));
         parent.addView(row);
     }
 
@@ -657,12 +265,12 @@ public class Statistics extends AppCompatActivity {
     private void updateTopPlants(List<InvoiceDatabase.ProductSales> sales) {
         topPlantsList.removeAllViews();
         if (sales.isEmpty()) {
-            TextView empty = text("Chưa có dữ liệu bán hàng trong khoảng ngày này",
-                    12, GRAY, false);
-            empty.setGravity(Gravity.CENTER);
-            topPlantsList.addView(empty, lp(-1, 150));
+            tvTopPlantsEmpty.setVisibility(View.VISIBLE);
+            topPlantsList.setVisibility(View.GONE);
             return;
         }
+        tvTopPlantsEmpty.setVisibility(View.GONE);
+        topPlantsList.setVisibility(View.VISIBLE);
         int highest = sales.get(0).quantity;
         for (InvoiceDatabase.ProductSales sale : sales) {
             addTopPlant(topPlantsList, sale, highest);
